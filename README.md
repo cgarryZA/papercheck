@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/logo.png" alt="papercheck" width="680"/>
+<img src="https://raw.githubusercontent.com/cgarryZA/papercheck/main/docs/assets/logo.png" alt="papercheck" width="680"/>
 
 <br/>
 
@@ -9,7 +9,7 @@ A reproducible audit harness for mathematical LaTeX papers.
 <a href="https://github.com/cgarryZA/papercheck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e"></a>
 <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white"></a>
 <img src="https://img.shields.io/badge/tests-140_passing-16a34a">
-<img src="https://img.shields.io/badge/version-0.3.0-8b5cf6">
+<img src="https://img.shields.io/badge/version-0.3.1-8b5cf6">
 <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-server-ff6d00"></a>
 
 </div>
@@ -118,15 +118,15 @@ One deterministic core, two frontends, no LLM calls inside the harness. paperche
 | `papercheck prompts list\|show` | the vendored audit prompt pack |
 | `papercheck mcp` | run the MCP server (stdio) |
 
-For a paper repository, [`docs/ci.md`](docs/ci.md) describes a mechanical, LLM-free GitHub Action that runs `scan` and `gate --mechanical-only` on every pull request and sends nothing to any model provider.
+For a paper repository, [`docs/ci.md`](https://github.com/cgarryZA/papercheck/blob/main/docs/ci.md) describes a mechanical, LLM-free GitHub Action that runs `scan` and `gate --mechanical-only` on every pull request and sends nothing to any model provider.
 
 ## Limitations
 
-See [`docs/limitations.md`](docs/limitations.md) for the full version.
+See [`docs/limitations.md`](https://github.com/cgarryZA/papercheck/blob/main/docs/limitations.md) for the full version.
 
 - papercheck is not a theorem prover and not a replacement for peer review.
 - Catching a semantic error depends entirely on the driving model. papercheck keeps the process disciplined and traceable, but AI findings must be checked independently.
-- papercheck makes no network calls. The agent you drive it with may transmit your manuscript to its model provider, so review the relevant data terms before auditing unpublished work ([`docs/privacy.md`](docs/privacy.md)).
+- papercheck makes no network calls. The agent you drive it with may transmit your manuscript to its model provider, so review the relevant data terms before auditing unpublished work ([`docs/privacy.md`](https://github.com/cgarryZA/papercheck/blob/main/docs/privacy.md)).
 
 ## About
 
@@ -137,7 +137,7 @@ Built by Christian Garry.
 
 ## Contributing
 
-Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md). The architecture is fixed for the 0.x line: strictly MCP and CLI, JSON as the source of truth, gates enforced in code. Prompt changes are guarded by the eval fixtures described in [`docs/agent_eval.md`](docs/agent_eval.md).
+Contributions welcome — see [`CONTRIBUTING.md`](https://github.com/cgarryZA/papercheck/blob/main/CONTRIBUTING.md). The architecture is fixed for the 0.x line: strictly MCP and CLI, JSON as the source of truth, gates enforced in code. Prompt changes are guarded by the eval fixtures described in [`docs/agent_eval.md`](https://github.com/cgarryZA/papercheck/blob/main/docs/agent_eval.md).
 
 ## References
 
@@ -145,8 +145,8 @@ Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md). The architec
 
 1. Rajesh Jayaram, Drew Tyler, David Woodruff, Corinna Cortes, Yossi Matias, Vahab Mirrokni, and Vincent Cohen-Addad. *Towards Automating Scientific Review with Google's Paper Assistant Tool.* arXiv:2606.28277, 2026. <https://arxiv.org/abs/2606.28277>
 
-BibTeX for the above is in [`docs/references.bib`](docs/references.bib).
+BibTeX for the above is in [`docs/references.bib`](https://github.com/cgarryZA/papercheck/blob/main/docs/references.bib).
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE). If papercheck is useful in your work, cite it via [`CITATION.cff`](CITATION.cff).
+MIT — see [`LICENSE`](https://github.com/cgarryZA/papercheck/blob/main/LICENSE). If papercheck is useful in your work, cite it via [`CITATION.cff`](https://github.com/cgarryZA/papercheck/blob/main/CITATION.cff).

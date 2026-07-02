@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "papercheck"
-version = "0.3.0"
+version = "0.3.1"
 description = "A reproducible audit harness for mathematical LaTeX papers."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,8 +26,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/OWNER-PLACEHOLDER/papercheck"
-Repository = "https://github.com/OWNER-PLACEHOLDER/papercheck"
+Homepage = "https://github.com/cgarryZA/papercheck"
+Repository = "https://github.com/cgarryZA/papercheck"
+Issues = "https://github.com/cgarryZA/papercheck/issues"
+Changelog = "https://github.com/cgarryZA/papercheck/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [

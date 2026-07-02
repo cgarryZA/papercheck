@@ -5,6 +5,15 @@ All notable changes to papercheck are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-07-02
+
+### Fixed
+
+- README now uses absolute URLs for the logo and internal doc links so it
+  renders correctly on PyPI (relative paths produced a broken image there).
+- Corrected the `project.urls` metadata (Homepage/Repository) that still
+  pointed at a placeholder owner; added Issues and Changelog links.
+
 ## [0.3.0] — 2026-07-02
 
 ### Added
