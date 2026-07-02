@@ -1,0 +1,7 @@
+{
+  "duplicate_labels": ["thm:main"],
+  "unresolved_refs": ["fig:nowhere"],
+  "unresolved_citations": ["ghost2020"],
+  "has_draft_marker": true,
+  "min_theorem_envs": 1
+}
