@@ -1,0 +1,18 @@
+# Generic domain pack for general mathematics.
+#
+# Written from standard graduate-textbook knowledge of the field. These are the
+# danger zones common to *any* mathematical paper, not the danger zones of any
+# particular manuscript.
+domain: general mathematics
+high_risk_topics:
+  - undefined objects used before definition or declared
+  - hidden regularity, measurability, or integrability assumptions
+  - constant dependence on parameters (explicit vs implicit)
+  - exchange of limits, sums, and integrals (justification required)
+  - circular dependencies between results or theorems
+  - edge cases and boundary conditions
+  - quantifier order and scope
+  - implicit use of axioms (choice, excluded middle)
+  - notation overloading and ambiguity
+claim_triggers: [obvious, clearly, trivial, straightforward, immediate, sharp, optimal, exact, first, novel]
+auditors: [formalist, notation, related_work]

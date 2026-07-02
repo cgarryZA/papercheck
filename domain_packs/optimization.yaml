@@ -1,0 +1,18 @@
+# Generic domain pack for optimization.
+#
+# Written from standard graduate-textbook knowledge of the field. These are the
+# danger zones common to *any* optimization paper, not the danger zones of any
+# particular manuscript.
+domain: optimization
+high_risk_topics:
+  - convexity assumptions (strict, strong, uniform)
+  - constraint qualifications (KKT, Slater, LICQ)
+  - first-order vs second-order optimality conditions
+  - step-size and learning-rate assumptions
+  - convergence rate claims and their hypotheses
+  - strong convexity vs plain convexity
+  - smoothness and Lipschitz-gradient assumptions
+  - global vs local optima and escape guarantees
+  - acceleration and momentum parameter tuning
+claim_triggers: [optimal, global, linear rate, sublinear, converges, tight]
+auditors: [formalist, domain_specialist, numerical, related_work]

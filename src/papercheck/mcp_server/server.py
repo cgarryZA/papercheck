@@ -170,6 +170,28 @@ def build_server() -> FastMCP:
         """Render all audit reports."""
         return handlers.render_reports(paper_root)
 
+    # -- domain packs -----------------------------------------------------
+
+    @mcp.tool()
+    def list_domain_packs(paper_root: str) -> list:
+        """List available domain packs (shipped, plus generated if present)."""
+        return handlers.list_domain_packs(paper_root)
+
+    @mcp.tool()
+    def get_domain_pack(name: str, paper_root: str | None = None) -> dict:
+        """Return a domain pack by name."""
+        return handlers.get_domain_pack(name, paper_root)
+
+    @mcp.tool()
+    def scaffold_domain_pack(paper_root: str) -> dict:
+        """Draft a candidate domain pack from the paper's structure."""
+        return handlers.scaffold_domain_pack(paper_root)
+
+    @mcp.tool()
+    def create_domain_pack(paper_root: str, pack: dict) -> str:
+        """Validate and persist a generated domain pack; return its path."""
+        return handlers.create_domain_pack(paper_root, pack)
+
     # -- prompts ----------------------------------------------------------
 
     @mcp.tool()

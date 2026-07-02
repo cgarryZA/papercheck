@@ -8,7 +8,14 @@ from jsonschema import Draft202012Validator
 
 from papercheck.core._resources import resource_file
 
-SCHEMA_NAMES: list[str] = ["issue", "patch", "segment", "manual_check", "state"]
+SCHEMA_NAMES: list[str] = [
+    "issue",
+    "patch",
+    "segment",
+    "manual_check",
+    "state",
+    "domain_pack",
+]
 
 _SCHEMA_CACHE: dict[str, dict] = {}
 

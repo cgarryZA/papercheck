@@ -1,0 +1,55 @@
+name: "papercheck mechanical gate"
+description: "Run mechanical safety checks on a LaTeX paper using papercheck"
+author: "papercheck"
+
+inputs:
+  paper-root:
+    description: "Path to the paper root directory (default: current directory)"
+    required: false
+    default: "."
+  python-version:
+    description: "Python version to use"
+    required: false
+    default: "3.12"
+  fail-on-gate:
+    description: "Fail the job if gate verdict is not READY or READY AFTER MECHANICAL FIXES"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install papercheck
+      shell: bash
+      run: |
+        # NOTE: papercheck is published to PyPI. If you are using an unpublished version,
+        # replace the line below with:
+        #   pip install git+https://github.com/OWNER/papercheck
+        pip install papercheck
+
+    - name: Run papercheck scan
+      shell: bash
+      run: papercheck scan "${{ inputs.paper-root }}"
+
+    - name: Run papercheck segments
+      shell: bash
+      run: papercheck segments "${{ inputs.paper-root }}"
+
+    - name: Run papercheck gate (mechanical only)
+      shell: bash
+      run: |
+        if [ "${{ inputs.fail-on-gate }}" = "true" ]; then
+          papercheck gate "${{ inputs.paper-root }}" --mechanical-only
+        else
+          papercheck gate "${{ inputs.paper-root }}" --mechanical-only || EXIT_CODE=$?
+          if [ -n "$EXIT_CODE" ] && [ "$EXIT_CODE" -ne 0 ]; then
+            echo "Gate verdict: NEEDS REVIEW (exit code $EXIT_CODE)"
+            exit 0
+          fi
+          echo "Gate verdict: READY"
+        fi

@@ -11,7 +11,7 @@ from papercheck.core.paths import audit_dir
 
 
 def test_import_and_version() -> None:
-    assert papercheck.__version__ == "0.1.0"
+    assert papercheck.__version__ == "0.2.0"
 
 
 def test_audit_dir() -> None:
@@ -24,4 +24,5 @@ def test_stages() -> None:
 
 
 def test_schema_names() -> None:
-    assert len(papercheck.core.schemas.SCHEMA_NAMES) == 5
+    assert len(papercheck.core.schemas.SCHEMA_NAMES) == 6
+    assert "domain_pack" in papercheck.core.schemas.SCHEMA_NAMES

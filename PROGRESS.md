@@ -42,17 +42,49 @@ P6: 85 → packaging: 87.**
 - **CI is green** — lint (`ruff`) + `pytest` + privacy check, on Ubuntu and
   Windows.
 
-## Explicitly deferred (out of scope for v0.1)
+## v0.2
 
-These are intentionally not built. See `CONTRIBUTING.md` for the discipline
-notes.
+- **HTML report** — `papercheck report <paper_root>` writes a self-contained
+  HTML audit report to `Paper_Audit/report/index.html` from JSON artifacts
+  (verdict banner, issue table, segments, manual checks).
+- **Version-compare** — `papercheck compare <old_root> <new_root>` produces a
+  structural diff showing added/removed/changed theorems by label, abstract
+  changes, and label/citation/section diffs; writes to `Paper_Audit/version_comparison.md`.
+- **Audit profiles** — `papercheck profile [list|show <name>]` exposes advisory
+  audit profiles (quick, arxiv, full, journal, no-cloud), each defining an
+  ordered sequence of recommended steps and a mechanical_only flag. Profiles are
+  advisory only; papercheck does not self-orchestrate.
+- **Domain pack generator** — `papercheck packs scaffold --paper-root <root>`
+  deterministically drafts a domain pack from a scanned paper's structure;
+  `papercheck packs create <file.json> --paper-root <root>` validates and
+  persists a filled-in pack to `Paper_Audit/domain_pack.json`. Four new MCP
+  tools (`list_domain_packs`, `get_domain_pack`, `scaffold_domain_pack`,
+  `create_domain_pack`) enable agents to fill in domain knowledge while
+  papercheck validates and stores the result.
+- **New domain packs** — shipped `pde`, `optimization`, `machine_learning`,
+  `general` (fully generic) in addition to existing `stochastic_analysis`,
+  `numerical_analysis`.
+- **End-user GitHub Action** — composite action + example workflow
+  (`.github/workflows/example-paper-audit.yml`) + `docs/ci.md` for running
+  mechanical-only checks (scan, segments, gate --mechanical-only) in CI. Never
+  sends the manuscript to any external service; papercheck's own dev CI is
+  unchanged.
+- **118 mechanical tests passing** (87 in v0.1 + 31 for new features).
 
-- LLM **provider adapters** — papercheck never calls a model itself.
-- **HTML report** output (Markdown only for now).
-- **Version-compare** auditing across manuscript revisions.
-- **Audit profiles** (preset severity / scope bundles).
-- **LLM-in-CI** — Tier 2 agent-eval stays manual; CI runs no model.
-- **More domain packs** beyond the two shipped.
+## v0.2 — Explicitly excluded by design
+
+These are intentionally not built:
+
+- **LLM provider adapters** — papercheck never calls a model itself; the agent
+  driving the audit supplies the reasoning.
+- **Self-orchestration** — papercheck is an MCP server and CLI, not an
+  autonomous agent.
+
+## Explicitly deferred (future or out of scope)
+
+- **LLM-in-CI evals** — Tier 2 agent-eval stays manual; CI runs no model.
+- **LaTeX AST parsing** — fine-grained structural analysis via AST traversal.
+- **Web UI** — the CLI and MCP tools form the user surface.
 
 ## Deviations from spec
 

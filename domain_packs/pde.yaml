@@ -1,0 +1,18 @@
+# Generic domain pack for partial differential equations.
+#
+# Written from standard graduate-textbook knowledge of the field. These are the
+# danger zones common to *any* paper in partial differential equations, not the
+# danger zones of any particular manuscript.
+domain: partial differential equations
+high_risk_topics:
+  - weak vs strong solutions and their equivalence
+  - function space regularity (Sobolev, Hölder, Besov spaces)
+  - boundary and initial condition compatibility and smoothness
+  - maximum principles and their hypotheses
+  - energy estimates and coercivity assumptions
+  - well-posedness (existence, uniqueness, stability)
+  - compactness arguments and limiting procedures
+  - trace theorems and restriction to boundaries
+  - Galerkin orthogonality and approximation properties
+claim_triggers: [sharp, optimal, wellposed, unique, global, classical]
+auditors: [formalist, domain_specialist, notation, related_work]

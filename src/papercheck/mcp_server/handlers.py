@@ -18,6 +18,7 @@ from pathlib import Path
 import papercheck
 from papercheck.core import adjudicate as _adjudicate
 from papercheck.core import (
+    domainpack,
     gate,
     issues,
     ledger,
@@ -287,6 +288,31 @@ def render_reports(paper_root: str | Path) -> dict:
     """Render all audit reports for the paper."""
     render.render_all(_root(paper_root))
     return {"ok": True}
+
+
+# -- domain packs ---------------------------------------------------------
+
+
+def list_domain_packs(paper_root: str | Path) -> list:
+    """Return available domain-pack names (shipped, plus generated if present)."""
+    return domainpack.list_packs(_root(paper_root))
+
+
+def get_domain_pack(name: str, paper_root: str | Path | None = None) -> dict:
+    """Return a domain pack by name (raises ``KeyError`` if absent)."""
+    root = _root(paper_root) if paper_root else None
+    return domainpack.load_pack(name, root)
+
+
+def scaffold_domain_pack(paper_root: str | Path) -> dict:
+    """Draft a candidate domain pack from the paper's structure (read-only)."""
+    structure = _load_json(paths.structure_file(_root(paper_root)), {})
+    return domainpack.scaffold_pack(structure)
+
+
+def create_domain_pack(paper_root: str | Path, pack: dict) -> str:
+    """Validate and persist a generated domain pack; return its path."""
+    return str(domainpack.create_pack(_root(paper_root), pack))
 
 
 # -- prompts --------------------------------------------------------------

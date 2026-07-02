@@ -183,6 +183,121 @@ def prompts(
 
 
 @app.command()
+def report(
+    paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
+) -> None:
+    """Render a self-contained HTML audit report from the Paper_Audit artifacts."""
+    from papercheck.core.html_report import render_html
+
+    out = render_html(Path(paper_root))
+    typer.echo(f"HTML report -> {out}")
+    raise typer.Exit(0)
+
+
+@app.command()
+def compare(
+    old_root: str = typer.Argument(..., help="Path to the OLD version's source root."),
+    new_root: str = typer.Argument(..., help="Path to the NEW version's source root."),
+) -> None:
+    """Compare two versions of a paper and write a structural diff report."""
+    from papercheck.core.compare import write_compare_report
+
+    out = write_compare_report(Path(old_root), Path(new_root))
+    typer.echo(f"Version comparison -> {out}")
+    raise typer.Exit(0)
+
+
+@app.command()
+def profile(
+    action: str = typer.Argument("list", help="Either 'list' or 'show'."),
+    name: str | None = typer.Argument(None, help="Profile name (for 'show')."),
+) -> None:
+    """List advisory audit profiles, or show one profile's recommended steps."""
+    from papercheck.core import profiles as profiles_mod
+
+    if action == "list":
+        for pname in profiles_mod.list_profiles():
+            prof = profiles_mod.get_profile(pname)
+            typer.echo(f"{pname}: {prof.get('description', '')}")
+        raise typer.Exit(0)
+    if action == "show":
+        if not name:
+            typer.echo("profile show requires a NAME argument")
+            raise typer.Exit(2)
+        try:
+            prof = profiles_mod.get_profile(name)
+        except KeyError:
+            typer.echo(f"No such profile: {name}")
+            raise typer.Exit(1) from None
+        typer.echo(f"{name}: {prof.get('description', '')}")
+        typer.echo(f"  mechanical_only: {prof.get('mechanical_only')}")
+        typer.echo("  steps:")
+        for step in prof.get("steps", []):
+            typer.echo(f"    - {step}")
+        raise typer.Exit(0)
+    typer.echo(f"Unknown action {action!r}; expected 'list' or 'show'")
+    raise typer.Exit(2)
+
+
+@app.command()
+def packs(
+    action: str = typer.Argument("list", help="One of 'list', 'show', 'scaffold', 'create'."),
+    name: str | None = typer.Argument(None, help="Pack name (for 'show')."),
+    paper_root: str | None = typer.Option(
+        None, "--paper-root", help="Paper root, for paper-local scaffold/create/generated packs."
+    ),
+) -> None:
+    """Manage domain packs: list/show shipped packs, or scaffold/create one from a paper."""
+    from papercheck.core import domainpack
+
+    root = Path(paper_root) if paper_root else None
+
+    if action == "list":
+        for pname in domainpack.list_packs(root):
+            typer.echo(pname)
+        raise typer.Exit(0)
+    if action == "show":
+        if not name:
+            typer.echo("packs show requires a NAME argument")
+            raise typer.Exit(2)
+        try:
+            typer.echo(json.dumps(domainpack.load_pack(name, root), indent=2))
+        except KeyError:
+            typer.echo(f"No such domain pack: {name}")
+            raise typer.Exit(1) from None
+        raise typer.Exit(0)
+    if action == "scaffold":
+        if root is None:
+            typer.echo("packs scaffold requires --paper-root")
+            raise typer.Exit(2)
+        struct_path = paths.structure_file(root)
+        if struct_path.exists():
+            structure = json.loads(struct_path.read_text(encoding="utf-8"))
+        else:
+            structure = texscan.scan(root)
+        typer.echo(json.dumps(domainpack.scaffold_pack(structure), indent=2))
+        typer.echo("")
+        typer.echo(
+            "# Draft only. Refine the fields, save to a JSON file, "
+            "then: papercheck packs create --paper-root <root> <file.json>"
+        )
+        raise typer.Exit(0)
+    if action == "create":
+        if root is None:
+            typer.echo("packs create requires --paper-root")
+            raise typer.Exit(2)
+        if not name:
+            typer.echo("packs create requires a PATH to a pack JSON file as NAME argument")
+            raise typer.Exit(2)
+        pack = json.loads(Path(name).read_text(encoding="utf-8"))
+        out = domainpack.create_pack(root, pack)
+        typer.echo(f"Domain pack -> {out}")
+        raise typer.Exit(0)
+    typer.echo(f"Unknown action {action!r}; expected list/show/scaffold/create")
+    raise typer.Exit(2)
+
+
+@app.command()
 def mcp() -> None:
     """Run the papercheck MCP server (blocking stdio transport)."""
     from papercheck.mcp_server.server import main as _server_main

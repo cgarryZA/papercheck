@@ -40,6 +40,21 @@ papercheck gate tests/fixtures/toy_clean_paper --mechanical-only
 # -> prints READY
 ```
 
+## CLI commands
+
+- `scan <paper_root>` — deterministic structure extraction to `structure.json`.
+- `segments <paper_root>` — partition the paper into proof segments.
+- `gate <paper_root> [--mechanical-only]` — run the final acceptance gate (mechanical signals only or with LLM audit findings).
+- `render <paper_root>` — render a Markdown report from the ledger.
+- `report <paper_root>` — write a self-contained HTML audit report to `Paper_Audit/report/index.html`.
+- `compare <old_root> <new_root>` — structural diff of two paper versions (theorems, abstract, labels, citations, equations).
+- `profile [list|show <name>]` — list and inspect advisory audit profiles (quick, arxiv, full, journal, no-cloud).
+- `packs [list|show <name>|scaffold --paper-root <root>|create <file.json> --paper-root <root>]` — manage domain packs.
+
+## Domain packs
+
+papercheck ships generic domain packs (`pde`, `optimization`, `machine_learning`, `general`, `stochastic_analysis`, `numerical_analysis`) that define domain-specific fields (e.g. theorem categories, technique keywords). You can scaffold a paper-specific pack deterministically using `papercheck packs scaffold --paper-root <root>`, or fill one in and create it with `papercheck packs create <file.json> --paper-root <root>`. The driving agent (e.g. Claude Code) supplies domain knowledge; papercheck validates and stores the result to `Paper_Audit/domain_pack.json`. Four MCP tools expose domain-pack operations to agents.
+
 A rendered `10_final_acceptance_gate.md` for a clean paper looks like:
 
 ```markdown
@@ -118,6 +133,10 @@ drive it may transmit your manuscript to its model provider. Review your
 agent/provider's data terms before auditing unpublished work.**
 
 See [`docs/privacy.md`](docs/privacy.md).
+
+## GitHub Action (mechanical-only checks)
+
+A composite GitHub Action runs the deterministic scanner and gate on every push, producing a `Paper_Audit/` artifact without any LLM calls. See [`docs/ci.md`](docs/ci.md) for setup and configuration.
 
 ## License
 

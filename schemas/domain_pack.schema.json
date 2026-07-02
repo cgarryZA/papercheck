@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "papercheck/domain_pack.schema.json",
+  "title": "DomainPack",
+  "type": "object",
+  "required": ["domain", "high_risk_topics", "claim_triggers", "auditors"],
+  "properties": {
+    "domain": { "type": "string" },
+    "high_risk_topics": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "claim_triggers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "auditors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "name": { "type": "string" },
+    "notes": { "type": "string" },
+    "generated_from": { "type": "string" }
+  },
+  "additionalProperties": true
+}

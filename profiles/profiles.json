@@ -1,0 +1,74 @@
+{
+  "quick": {
+    "description": "Fast mechanical pass, no deep audit.",
+    "steps": ["scan", "segments", "gate"],
+    "mechanical_only": true
+  },
+  "arxiv": {
+    "description": "Pre-arXiv check: mechanical + core proof/hygiene/novelty audit.",
+    "steps": [
+      "scan",
+      "segments",
+      "inventory",
+      "formalist_audit",
+      "source_hygiene_audit",
+      "novelty_audit",
+      "adjudicate",
+      "gate"
+    ],
+    "mechanical_only": false
+  },
+  "full": {
+    "description": "Complete pipeline: all audit passes.",
+    "steps": [
+      "scan",
+      "segments",
+      "inventory",
+      "assumption_audit",
+      "equation_index",
+      "formalist_audit",
+      "domain_specialist_audit",
+      "main_theorem_audit",
+      "numerical_audit",
+      "novelty_audit",
+      "notation_audit",
+      "source_hygiene_audit",
+      "synthesis",
+      "adjudicate",
+      "patch_plan",
+      "patch",
+      "regression",
+      "gate"
+    ],
+    "mechanical_only": false
+  },
+  "journal": {
+    "description": "Full pipeline with emphasis on related-work and novelty rigor.",
+    "steps": [
+      "scan",
+      "segments",
+      "inventory",
+      "assumption_audit",
+      "equation_index",
+      "formalist_audit",
+      "domain_specialist_audit",
+      "main_theorem_audit",
+      "numerical_audit",
+      "novelty_audit",
+      "notation_audit",
+      "source_hygiene_audit",
+      "synthesis",
+      "adjudicate",
+      "patch_plan",
+      "patch",
+      "regression",
+      "gate"
+    ],
+    "mechanical_only": false
+  },
+  "no-cloud": {
+    "description": "Mechanical-only checks safe to run without sending text to any model provider.",
+    "steps": ["scan", "segments", "source_hygiene_audit", "gate"],
+    "mechanical_only": true
+  }
+}

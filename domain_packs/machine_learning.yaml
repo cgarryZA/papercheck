@@ -1,0 +1,18 @@
+# Generic domain pack for machine learning theory.
+#
+# Written from standard graduate-textbook knowledge of the field. These are the
+# danger zones common to *any* machine learning theory paper, not the danger
+# zones of any particular manuscript.
+domain: machine learning theory
+high_risk_topics:
+  - i.i.d. vs dependent data assumptions
+  - generalization bound hypotheses and their necessity
+  - sample-complexity and lower bounds
+  - capacity measures (VC dimension, Rademacher complexity, metric entropy)
+  - optimization-vs-statistical-error conflation
+  - distribution shift and domain adaptation assumptions
+  - concentration inequality conditions and validity
+  - train-test leakage and data-splitting protocols
+  - label noise and corruption models
+claim_triggers: [state-of-the-art, novel, first, guarantees, provably, optimal]
+auditors: [formalist, domain_specialist, numerical, related_work]

@@ -1,0 +1,40 @@
+name: "Papercheck Mechanical Audit"
+
+# Trigger on pull requests and manual workflow runs
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  mechanical-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # USAGE OPTION 1: Use the published GitHub Action from the papercheck repo
+      # (requires papercheck to be published and the action to be in the OWNER/papercheck repo)
+      # Uncomment the step below and comment out USAGE OPTION 2:
+      #
+      # - name: Run papercheck mechanical audit
+      #   uses: OWNER/papercheck@v0.2.0
+      #   with:
+      #     paper-root: "."
+
+      # USAGE OPTION 2: Install and run papercheck directly in the workflow
+      # Use this if you haven't published the action to GitHub yet, or for testing.
+      # Replace "." with the path to your paper root (e.g., "paper/" if sources are in a subdirectory).
+      - name: Run papercheck mechanical audit
+        uses: actions/checkout@v4  # This ensures we have the latest code
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install papercheck
+        run: pip install papercheck
+      - name: Run scan
+        run: papercheck scan "."
+      - name: Run segments
+        run: papercheck segments "."
+      - name: Run gate check
+        run: papercheck gate "." --mechanical-only
