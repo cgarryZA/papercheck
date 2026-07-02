@@ -30,11 +30,7 @@ runs:
 
     - name: Install papercheck
       shell: bash
-      run: |
-        # papercheck is not yet on PyPI. Until it is published, install from GitHub:
-        pip install git+https://github.com/cgarryZA/papercheck
-        # Once published to PyPI, replace the line above with:
-        #   pip install papercheck
+      run: pip install papercheck
 
     - name: Run papercheck scan
       shell: bash
