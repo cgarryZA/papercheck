@@ -1,0 +1,8 @@
+{
+  "defect_type": "constant_dependence",
+  "claim": "constant independent of T",
+  "reality": "bound contains e^{LT}",
+  "location_hint": "proof of Theorem 1",
+  "severity": "SERIOUS",
+  "mechanically_detectable": false
+}

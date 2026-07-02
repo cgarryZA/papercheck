@@ -1,0 +1,43 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+
+\title{A Toy Gronwall Bound}
+\author{Test Author}
+\maketitle
+
+\begin{abstract}
+We record an elementary Gronwall-type bound for a scalar differential
+inequality. The proof is self-contained toy material.
+\end{abstract}
+
+\section{Setting}
+Let $u : [0, T] \to \mathbb{R}$ be nonnegative and continuous, let $L > 0$, and
+suppose the integral inequality
+\begin{equation}
+\label{eq:gronwall-hyp}
+u(t) \le C_0 + L \int_0^t u(s) \, ds, \qquad 0 \le t \le T,
+\end{equation}
+holds for some constant $C_0 \ge 0$.
+
+\begin{theorem}
+\label{thm:gronwall}
+Under the hypotheses above, $u(t) \le C_0 e^{L t}$ for all $t \in [0, T]$.
+Consequently $u$ is bounded by a constant $C = C_0 e^{L T}$ that is
+independent of the horizon $T$.
+\end{theorem}
+
+\begin{proof}
+Set $R(t) = C_0 + L \int_0^t u(s)\, ds$, so that $u(t) \le R(t)$ and
+$R'(t) = L\, u(t) \le L\, R(t)$. Thus $\frac{d}{dt}\big(e^{-Lt} R(t)\big) \le 0$,
+so $e^{-Lt} R(t) \le R(0) = C_0$, giving $R(t) \le C_0 e^{Lt}$ and hence
+$u(t) \le C_0 e^{L t}$. Evaluating the exponential factor over the whole
+interval yields the uniform bound $C = C_0 e^{L T}$.
+\end{proof}
+
+\end{document}

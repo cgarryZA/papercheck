@@ -1,0 +1,17 @@
+# Generic domain pack for stochastic analysis.
+#
+# Written from standard graduate-textbook knowledge of the field. These are the
+# danger zones common to *any* paper in stochastic analysis, not the danger
+# zones of any particular manuscript.
+domain: stochastic analysis
+high_risk_topics:
+  - predictability and adaptedness of integrands
+  - left limits at jump times vs post-jump values
+  - compensators and compensated Poisson integrals
+  - Ito isometry hypotheses (square-integrability)
+  - Gronwall/Bellman constant dependence on horizon and coefficients
+  - exchange of limit and expectation (uniform integrability)
+  - Wasserstein vs L2 metrics on laws
+  - martingale representation completeness
+claim_triggers: [sharp, optimal, exact, first, novel, universal, tight]
+auditors: [formalist, domain_specialist, notation, related_work]

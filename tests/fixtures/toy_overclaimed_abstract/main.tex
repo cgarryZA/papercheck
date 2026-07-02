@@ -1,0 +1,39 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+
+\title{A Toy Fixed-Point Note}
+\author{Test Author}
+\maketitle
+
+\begin{abstract}
+We show that for all continuous functions $g : [0, 1] \to [0, 1]$ the iteration
+$x_{n+1} = g(x_n)$ converges to a unique fixed point from any starting value.
+The argument is elementary toy material.
+\end{abstract}
+
+\section{A Convergence Result}
+Consider a map $g : [0, 1] \to [0, 1]$.
+
+\begin{theorem}
+\label{thm:contraction}
+Suppose $g : [0, 1] \to [0, 1]$ is Lipschitz with constant $\kappa < 1$, i.e.
+$|g(x) - g(y)| \le \kappa |x - y|$ for all $x, y \in [0, 1]$. Then $g$ has a
+unique fixed point $x^\star$, and for any $x_0 \in [0, 1]$ the iteration
+$x_{n+1} = g(x_n)$ satisfies $|x_n - x^\star| \le \kappa^n |x_0 - x^\star| \to 0$.
+\end{theorem}
+
+\begin{proof}
+For any $x, y$, $|g(x) - g(y)| \le \kappa |x - y|$ with $\kappa < 1$, so $g$ is a
+contraction on the complete metric space $[0, 1]$. By the Banach fixed-point
+theorem $g$ has a unique fixed point $x^\star$, and iterating the contraction
+estimate gives $|x_n - x^\star| = |g(x_{n-1}) - g(x^\star)| \le \kappa |x_{n-1} -
+x^\star| \le \cdots \le \kappa^n |x_0 - x^\star|$, which tends to $0$.
+\end{proof}
+
+\end{document}

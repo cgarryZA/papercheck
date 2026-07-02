@@ -1,0 +1,17 @@
+# Generic domain pack for numerical analysis.
+#
+# Written from standard graduate-textbook knowledge of the field. These are the
+# danger zones common to *any* numerical-methods paper, not the danger zones of
+# any particular manuscript.
+domain: numerical analysis
+high_risk_topics:
+  - consistency, stability, and convergence (and their interplay)
+  - CFL and other step-size / stability conditions
+  - floating-point round-off and catastrophic cancellation
+  - mesh or grid dependence of error constants
+  - availability of an exact or reference solution to compare against
+  - order-of-accuracy claims vs observed convergence rates
+  - boundary and initial condition treatment at the discrete level
+  - conditioning of the discretized problem
+claim_triggers: [sharp, optimal, exact, first, novel, universal, tight, robust]
+auditors: [formalist, domain_specialist, notation]

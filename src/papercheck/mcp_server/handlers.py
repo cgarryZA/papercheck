@@ -305,8 +305,16 @@ def list_prompts() -> list:
 
 
 def get_prompt(name: str) -> str:
-    """Return the text of a named prompt (raises ``KeyError`` if absent)."""
-    path = _prompts_dir() / name
-    if not path.is_file():
-        raise KeyError(f"Prompt {name!r} not found")
-    return path.read_text(encoding="utf-8")
+    """Return the text of a named prompt (raises ``KeyError`` if absent).
+
+    The name may be given with or without the ``.md`` suffix.
+    """
+    prompts_dir = _prompts_dir()
+    candidates = [name]
+    if not name.endswith(".md"):
+        candidates.append(name + ".md")
+    for candidate in candidates:
+        path = prompts_dir / candidate
+        if path.is_file():
+            return path.read_text(encoding="utf-8")
+    raise KeyError(f"Prompt {name!r} not found")

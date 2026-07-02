@@ -1,0 +1,6 @@
+{
+  "defect_type": "none",
+  "trap": "correct argument that looks suspicious",
+  "expected_adjudication": "REJECT",
+  "note": "auditor should NOT accept an issue here. The 'by symmetry' step and the non-obvious 2n constant are both correct: sum_i sum_j a_i^2 = n sum_i a_i^2, and likewise for a_j^2, so the two square terms give 2n sum a_i^2; sum_i a_i S = S^2 yields the -2 S^2 term."
+}

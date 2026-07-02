@@ -1,0 +1,9 @@
+{
+  "defect_type": "overclaim",
+  "category": "framing/novelty",
+  "claim": "abstract asserts convergence to a unique fixed point for ALL continuous functions g:[0,1]->[0,1]",
+  "reality": "Theorem 1 proves it only for Lipschitz contractions (constant kappa < 1); mere continuity is insufficient (e.g. g(x)=x is continuous with infinitely many/every point fixed and no contraction rate)",
+  "location_hint": "abstract vs statement of Theorem 1",
+  "severity": "SERIOUS",
+  "mechanically_detectable": false
+}

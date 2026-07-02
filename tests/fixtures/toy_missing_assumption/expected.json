@@ -1,0 +1,9 @@
+{
+  "defect_type": "missing_assumption",
+  "claim": "the average of f against density p is bounded by M",
+  "reality": "the proof silently assumes f (and hence f*p) is measurable/integrable so that the integral exists and the triangle inequality for integrals applies; the hypotheses only bound |f| and never state measurability or integrability of f",
+  "missing_hypothesis": "f measurable (equivalently, f*p integrable on [0,1])",
+  "location_hint": "proof of Lemma 1, step 'The integral ... exists'",
+  "severity": "SERIOUS",
+  "mechanically_detectable": false
+}

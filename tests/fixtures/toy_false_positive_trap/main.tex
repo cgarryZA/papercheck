@@ -1,0 +1,45 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+
+\title{A Toy Symmetric Integral}
+\author{Test Author}
+\maketitle
+
+\begin{abstract}
+We evaluate an elementary symmetric double sum. The proof is short and uses a
+symmetry argument; it is correct despite its terseness. Self-contained toy
+material.
+\end{abstract}
+
+\section{A Symmetric Identity}
+Let $a_1, \dots, a_n$ be real numbers and set $S = \sum_{i=1}^n a_i$.
+
+\begin{theorem}
+\label{thm:symmetric}
+We have
+\[
+  \sum_{i=1}^n \sum_{j=1}^n (a_i - a_j)^2 = 2 n \sum_{i=1}^n a_i^2 - 2 S^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+Expand $(a_i - a_j)^2 = a_i^2 - 2 a_i a_j + a_j^2$. Summing over $j$ from $1$ to
+$n$ for fixed $i$ gives $n a_i^2 - 2 a_i S + \sum_{j} a_j^2$. By symmetry in $i$
+and $j$, the $\sum_i \sum_j a_i^2$ and $\sum_i \sum_j a_j^2$ contributions are
+equal, each equal to $n \sum_i a_i^2$. Hence
+\[
+  \sum_{i}\sum_{j} (a_i - a_j)^2
+    = n \sum_i a_i^2 - 2 \sum_i a_i S + n \sum_j a_j^2
+    = 2 n \sum_{i=1}^n a_i^2 - 2 S^2,
+\]
+using $\sum_i a_i S = S^2$. The factor $2n$ (not $n$) is correct because the two
+symmetric square terms each contribute $n \sum_i a_i^2$.
+\end{proof}
+
+\end{document}

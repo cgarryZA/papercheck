@@ -1,0 +1,42 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\title{A Toy Averaging Lemma}
+\author{Test Author}
+\maketitle
+
+\begin{abstract}
+We record an elementary bound on the average of a function against a
+probability density. The material is self-contained toy content.
+\end{abstract}
+
+\section{An Averaging Bound}
+Let $f : [0, 1] \to \mathbb{R}$ and let $p : [0, 1] \to [0, \infty)$ satisfy
+$\int_0^1 p(x)\, dx = 1$.
+
+\begin{lemma}
+\label{lem:average}
+Suppose $|f(x)| \le M$ for all $x \in [0, 1]$. Then
+\[
+  \left| \int_0^1 f(x)\, p(x)\, dx \right| \le M.
+\]
+\end{lemma}
+
+\begin{proof}
+The integral $\int_0^1 f(x)\, p(x)\, dx$ exists, and by the triangle inequality
+for integrals we have
+\[
+  \left| \int_0^1 f(x)\, p(x)\, dx \right|
+    \le \int_0^1 |f(x)|\, p(x)\, dx
+    \le M \int_0^1 p(x)\, dx = M,
+\]
+where the last step uses $\int_0^1 p(x)\, dx = 1$.
+\end{proof}
+
+\end{document}
