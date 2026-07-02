@@ -1,6 +1,10 @@
 name: "papercheck mechanical gate"
 description: "Run mechanical safety checks on a LaTeX paper using papercheck"
-author: "papercheck"
+author: "Christian Garry"
+
+branding:
+  icon: "check-circle"
+  color: "green"
 
 inputs:
   paper-root:
@@ -27,10 +31,10 @@ runs:
     - name: Install papercheck
       shell: bash
       run: |
-        # NOTE: papercheck is published to PyPI. If you are using an unpublished version,
-        # replace the line below with:
-        #   pip install git+https://github.com/OWNER/papercheck
-        pip install papercheck
+        # papercheck is not yet on PyPI. Until it is published, install from GitHub:
+        pip install git+https://github.com/cgarryZA/papercheck
+        # Once published to PyPI, replace the line above with:
+        #   pip install papercheck
 
     - name: Run papercheck scan
       shell: bash
