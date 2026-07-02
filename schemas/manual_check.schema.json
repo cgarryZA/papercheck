@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "papercheck/manual_check.schema.json",
+  "title": "ManualCheck",
+  "type": "object",
+  "required": ["check_id", "question", "blocking"],
+  "properties": {
+    "check_id": {
+      "type": "string",
+      "pattern": "^MANUAL-[0-9]+$"
+    },
+    "question": { "type": "string" },
+    "needed_source": { "type": ["string", "null"] },
+    "blocking": { "type": "boolean" },
+    "owner": {
+      "type": "string",
+      "default": "human"
+    },
+    "resolution": {
+      "type": ["string", "null"],
+      "default": null
+    },
+    "resolved": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "additionalProperties": false
+}

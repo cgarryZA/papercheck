@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "papercheck/state.schema.json",
+  "title": "AuditState",
+  "type": "object",
+  "required": ["run_id", "harness_version", "stage", "completed_stages"],
+  "properties": {
+    "run_id": { "type": "string" },
+    "harness_version": { "type": "string" },
+    "paper_root": { "type": "string" },
+    "paper_git_commit": { "type": ["string", "null"] },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "INIT",
+        "SCANNED",
+        "SEGMENTED",
+        "INVENTORIED",
+        "AUDITING",
+        "SYNTHESIZED",
+        "ADJUDICATED",
+        "PATCH_PLANNED",
+        "PATCHING",
+        "REGRESSED",
+        "GATED"
+      ]
+    },
+    "completed_stages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "INIT",
+          "SCANNED",
+          "SEGMENTED",
+          "INVENTORIED",
+          "AUDITING",
+          "SYNTHESIZED",
+          "ADJUDICATED",
+          "PATCH_PLANNED",
+          "PATCHING",
+          "REGRESSED",
+          "GATED"
+        ]
+      }
+    },
+    "stage_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "at", "by"],
+        "properties": {
+          "stage": { "type": "string" },
+          "at": { "type": "string" },
+          "by": { "type": "string" }
+        }
+      }
+    },
+    "blocking_errors": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}

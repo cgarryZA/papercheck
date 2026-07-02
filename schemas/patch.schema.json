@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "papercheck/patch.schema.json",
+  "title": "Patch",
+  "type": "object",
+  "required": ["patch_id", "accepted_issue_ids", "patch_type", "files_changed"],
+  "properties": {
+    "patch_id": {
+      "type": "string",
+      "pattern": "^PATCH-[0-9]+$"
+    },
+    "accepted_issue_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]+-[0-9]+$"
+      },
+      "minItems": 1
+    },
+    "patch_type": {
+      "type": "string",
+      "enum": [
+        "theorem",
+        "proof",
+        "assumption",
+        "notation",
+        "experiment",
+        "citation",
+        "hygiene",
+        "wording"
+      ]
+    },
+    "files_changed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "current_text": { "type": "string" },
+    "replacement_text": { "type": "string" },
+    "reason": { "type": "string" },
+    "downstream_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "build_required": { "type": "boolean" },
+    "regression_required": { "type": "boolean" },
+    "risk": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    }
+  },
+  "additionalProperties": false
+}

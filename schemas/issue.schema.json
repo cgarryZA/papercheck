@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "papercheck/issue.schema.json",
+  "title": "Issue",
+  "type": "object",
+  "required": [
+    "issue_id",
+    "source_auditors",
+    "status",
+    "severity_proposed",
+    "category",
+    "location",
+    "exact_quote",
+    "claim",
+    "concrete_failure_mode",
+    "required_fix",
+    "patch_locality",
+    "confidence"
+  ],
+  "properties": {
+    "issue_id": {
+      "type": "string",
+      "pattern": "^[A-Z]+-[0-9]+$"
+    },
+    "source_auditors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "ACCEPTED",
+        "REJECTED",
+        "NEEDS_MANUAL_CHECK",
+        "PATCH_PLANNED",
+        "PATCHED",
+        "REGRESSION_PASSED",
+        "CLOSED",
+        "REJECTED_SOURCE_TARGET_INVALID"
+      ]
+    },
+    "severity_proposed": {
+      "type": "string",
+      "enum": ["FATAL", "SERIOUS", "MODERATE", "MINOR", "IGNORE"]
+    },
+    "severity_final": {
+      "type": ["string", "null"],
+      "enum": ["FATAL", "SERIOUS", "MODERATE", "MINOR", "IGNORE", null]
+    },
+    "category": {
+      "type": "string",
+      "enum": ["math", "numerics", "novelty", "notation", "hygiene", "framing"]
+    },
+    "location": {
+      "type": "object",
+      "required": ["file"],
+      "properties": {
+        "file": { "type": "string" },
+        "line_start": { "type": ["integer", "null"] },
+        "line_end": { "type": ["integer", "null"] },
+        "section": { "type": ["string", "null"] },
+        "label": { "type": ["string", "null"] }
+      }
+    },
+    "exact_quote": { "type": "string" },
+    "claim": { "type": "string" },
+    "concrete_failure_mode": { "type": "string" },
+    "required_fix": { "type": "string" },
+    "patch_locality": {
+      "type": "string",
+      "enum": ["local", "section-wide", "theorem-wide", "global", "external"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "theorems": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "equations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "external_check_required": { "type": "boolean" },
+    "adjudication": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": ["string", "null"],
+          "enum": ["ACCEPT", "REJECT", "NEEDS_MANUAL_CHECK", null]
+        },
+        "rationale": { "type": ["string", "null"] },
+        "adjudicator": { "type": ["string", "null"] }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "quote_found": { "type": ["boolean", "null"] },
+        "label_exists": { "type": ["boolean", "null"] },
+        "checked_at": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "additionalProperties": false
+}

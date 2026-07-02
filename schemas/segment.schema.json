@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "papercheck/segment.schema.json",
+  "title": "Segment",
+  "type": "object",
+  "required": ["segment_id", "title", "budget"],
+  "properties": {
+    "segment_id": {
+      "type": "string",
+      "pattern": "^S[0-9]+$"
+    },
+    "title": { "type": "string" },
+    "files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "line_ranges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "start", "end"],
+        "properties": {
+          "file": { "type": "string" },
+          "start": { "type": "integer" },
+          "end": { "type": "integer" }
+        }
+      }
+    },
+    "labels": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "risk_score": { "type": "number" },
+    "budget": {
+      "type": "string",
+      "enum": ["HIGH", "MEDIUM", "LOW"]
+    },
+    "reason": { "type": "string" },
+    "auditors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "budget_override": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": ["string", "null"],
+          "enum": ["HIGH", "MEDIUM", "LOW", null]
+        },
+        "reason": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "additionalProperties": false
+}
