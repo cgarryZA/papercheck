@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="docs/assets/logo.svg" alt="papercheck" width="820"/>
+<img src="docs/assets/logo.png" alt="papercheck" width="680"/>
 
 <br/>
 
