@@ -9,11 +9,24 @@ description = "A reproducible audit harness for mathematical LaTeX papers."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
+keywords = ["latex", "mathematics", "research-software", "reproducibility", "paper-review", "mcp", "audit"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
 dependencies = [
     "typer>=0.12",
     "jsonschema>=4.0",
     "mcp>=1.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/OWNER-PLACEHOLDER/papercheck"
+Repository = "https://github.com/OWNER-PLACEHOLDER/papercheck"
 
 [project.optional-dependencies]
 dev = [

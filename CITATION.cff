@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use papercheck, please cite it using these metadata."
+title: papercheck
+type: software
+version: 0.1.0
+license: MIT
+abstract: >-
+  papercheck is a reproducible audit harness for mathematical LaTeX papers. It
+  turns a paper into a stage-gated adversarial audit: deterministic structure
+  extraction, JSON-Schema-validated issue ledgers with mechanical quote
+  verification, and a code-enforced final gate that any MCP-capable agent can
+  drive but cannot skip. It does not itself call an LLM and is not a theorem
+  prover or a replacement for peer review.
+authors:
+  - name: "papercheck contributors"
+keywords:
+  - latex
+  - mathematics
+  - research-software
+  - reproducibility
+  - paper-review
+  - mcp
+  - audit
