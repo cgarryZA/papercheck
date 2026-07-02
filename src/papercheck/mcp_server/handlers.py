@@ -27,6 +27,7 @@ from papercheck.core import (
     texscan,
 )
 from papercheck.core import verify as _verify
+from papercheck.core._resources import resource_dir
 from papercheck.core.state import AuditState
 
 # Maximum number of source lines a single window read may return.
@@ -291,15 +292,11 @@ def render_reports(paper_root: str | Path) -> dict:
 # -- prompts --------------------------------------------------------------
 
 
-def _prompts_dir() -> Path:
-    """Locate the repo ``prompts/`` directory (may not exist yet)."""
-    return Path(__file__).resolve().parents[3] / "prompts"
-
-
 def list_prompts() -> list:
     """Return sorted names of ``*.md`` prompt files (``[]`` if none)."""
-    prompts_dir = _prompts_dir()
-    if not prompts_dir.is_dir():
+    try:
+        prompts_dir = resource_dir("prompts")
+    except FileNotFoundError:
         return []
     return sorted(p.name for p in prompts_dir.glob("*.md"))
 
@@ -309,7 +306,10 @@ def get_prompt(name: str) -> str:
 
     The name may be given with or without the ``.md`` suffix.
     """
-    prompts_dir = _prompts_dir()
+    try:
+        prompts_dir = resource_dir("prompts")
+    except FileNotFoundError:
+        raise KeyError(f"Prompt {name!r} not found")
     candidates = [name]
     if not name.endswith(".md"):
         candidates.append(name + ".md")

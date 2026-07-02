@@ -28,6 +28,12 @@ papercheck-mcp = "papercheck.mcp_server.server:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/papercheck"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"schemas" = "papercheck/schemas"
+"prompts" = "papercheck/prompts"
+"templates" = "papercheck/templates"
+"domain_packs" = "papercheck/domain_packs"
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"

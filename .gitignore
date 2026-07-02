@@ -3,6 +3,8 @@ __pycache__/
 .pytest_cache/
 build/
 dist/
+dist_check/
+*.whl
 .ruff_cache/
 Paper_Audit/
 
