@@ -298,6 +298,21 @@ def packs(
 
 
 @app.command()
+def serve(
+    paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
+    host: str = typer.Option("127.0.0.1", "--host", help="Host to bind (localhost)."),
+    port: int = typer.Option(8765, "--port", help="Port to bind."),
+    open_browser: bool = typer.Option(
+        False, "--open", help="Open the UI in a web browser after starting."
+    ),
+) -> None:
+    """Serve an interactive local web UI for a paper's audit state (blocking)."""
+    from papercheck.core.webserve import serve as _serve
+
+    _serve(Path(paper_root), host=host, port=port, open_browser=open_browser)
+
+
+@app.command()
 def mcp() -> None:
     """Run the papercheck MCP server (blocking stdio transport)."""
     from papercheck.mcp_server.server import main as _server_main

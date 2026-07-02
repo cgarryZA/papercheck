@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "papercheck"
-version = "0.2.0"
+version = "0.3.0"
 description = "A reproducible audit harness for mathematical LaTeX papers."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,6 +22,7 @@ dependencies = [
     "typer>=0.12",
     "jsonschema>=4.0",
     "mcp>=1.0",
+    "pylatexenc>=2.10",
 ]
 
 [project.urls]
