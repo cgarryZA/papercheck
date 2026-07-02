@@ -18,6 +18,8 @@ papercheck extracts a paper's structure, records findings in schema-validated le
 
 The point is discipline. Instead of asking one model to "review the paper," papercheck segments the manuscript, inventories the claims, runs narrow hostile audits, verifies each finding against the source, adjudicates, patches only what was accepted, and gates. The gates are enforced in code: an agent cannot patch before adjudication, and a finding whose quote does not appear in the source never enters the ledger.
 
+The staged pipeline — segment, budget, specialist review, synthesize, adjudicate — follows the approach described in Google Research's Paper Assistant Tool (PAT) [[1]](#references), adapted into a small, open, model-agnostic harness that runs no models of its own.
+
 ## What it is
 
 A deterministic Python core with two frontends — a CLI and an MCP server. papercheck itself never calls a model; the reasoning lives in the agent or in your hands at the CLI. What the core provides:
@@ -136,6 +138,14 @@ Built by Christian Garry.
 ## Contributing
 
 Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md). The architecture is fixed for the 0.x line: strictly MCP and CLI, JSON as the source of truth, gates enforced in code. Prompt changes are guarded by the eval fixtures described in [`docs/agent_eval.md`](docs/agent_eval.md).
+
+## References
+
+<a name="references"></a>
+
+1. Rajesh Jayaram, Drew Tyler, David Woodruff, Corinna Cortes, Yossi Matias, Vahab Mirrokni, and Vincent Cohen-Addad. *Towards Automating Scientific Review with Google's Paper Assistant Tool.* arXiv:2606.28277, 2026. <https://arxiv.org/abs/2606.28277>
+
+BibTeX for the above is in [`docs/references.bib`](docs/references.bib).
 
 ## License
 
