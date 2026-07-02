@@ -82,6 +82,22 @@ def segments(
         f"{level}={budget_counts.get(level, 0)}" for level in ("HIGH", "MEDIUM", "LOW")
     )
     typer.echo(f"Proposed {len(records)} segment(s): {summary}")
+
+    ranked = sorted(records, key=lambda r: r.get("risk_score", 0), reverse=True)
+    typer.echo("")
+    typer.echo(f"{'ID':<6} {'BUDGET':<7} {'RISK':<6} {'TITLE':<40} AUDITORS")
+    for rec in ranked:
+        title = str(rec.get("title", ""))
+        if len(title) > 40:
+            title = title[:37] + "..."
+        auditors = ", ".join(rec.get("auditors", []))
+        typer.echo(
+            f"{rec.get('segment_id', ''):<6} "
+            f"{rec.get('budget', ''):<7} "
+            f"{rec.get('risk_score', 0):<6} "
+            f"{title:<40} {auditors}"
+        )
+
     typer.echo(f"segments.json -> {paths.segments_file(root)}")
     raise typer.Exit(0)
 
@@ -93,7 +109,10 @@ def gate(
         False, "--mechanical-only", help="Run only the mechanical gate signals."
     ),
 ) -> None:
-    """Run the final gate checks for a paper."""
+    """Run the final gate checks for a paper.
+
+    Exit codes: 0 = READY, 2 = READY AFTER MECHANICAL FIXES, 1 = any NOT READY.
+    """
     from papercheck.core.gate import run_gate
 
     root = Path(paper_root)
@@ -109,8 +128,20 @@ def gate(
     else:
         typer.echo("No blockers.")
 
-    ready = result["verdict"] in {"READY", "READY AFTER MECHANICAL FIXES"}
-    raise typer.Exit(0 if ready else 1)
+    warnings = result.get("warnings", [])
+    if warnings:
+        typer.echo("Warnings:")
+        for w in warnings:
+            typer.echo(f"  - {w}")
+
+    verdict = result["verdict"]
+    if verdict == "READY":
+        code = 0
+    elif verdict == "READY AFTER MECHANICAL FIXES":
+        code = 2
+    else:
+        code = 1
+    raise typer.Exit(code)
 
 
 @app.command()
@@ -265,6 +296,9 @@ def packs(
         except KeyError:
             typer.echo(f"No such domain pack: {name}")
             raise typer.Exit(1) from None
+        except (RuntimeError, FileNotFoundError) as exc:
+            typer.echo(str(exc))
+            raise typer.Exit(1) from None
         raise typer.Exit(0)
     if action == "scaffold":
         if root is None:
@@ -289,8 +323,12 @@ def packs(
         if not name:
             typer.echo("packs create requires a PATH to a pack JSON file as NAME argument")
             raise typer.Exit(2)
-        pack = json.loads(Path(name).read_text(encoding="utf-8"))
-        out = domainpack.create_pack(root, pack)
+        try:
+            pack = json.loads(Path(name).read_text(encoding="utf-8"))
+            out = domainpack.create_pack(root, pack)
+        except (RuntimeError, FileNotFoundError) as exc:
+            typer.echo(str(exc))
+            raise typer.Exit(1) from None
         typer.echo(f"Domain pack -> {out}")
         raise typer.Exit(0)
     typer.echo(f"Unknown action {action!r}; expected list/show/scaffold/create")

@@ -83,3 +83,58 @@ def test_math_issue_when_no_manual(tmp_path) -> None:
     ledger.save_issue(root, _fatal_math_issue())
     result = run_gate(root, mechanical_only=True)
     assert result["verdict"] == "NOT READY: MATHEMATICAL ISSUE"
+
+
+_SENTENCE = "The convergence rate is provably optimal under mild assumptions."
+
+
+def _proposed_serious_math_issue() -> dict:
+    return {
+        "issue_id": "MATH-1",
+        "source_auditors": ["formalist"],
+        "status": "PROPOSED",
+        "severity_proposed": "SERIOUS",
+        "category": "math",
+        "location": {"file": "body.tex"},
+        "exact_quote": _SENTENCE,
+        "claim": "a proposed but un-adjudicated claim",
+        "concrete_failure_mode": "the proof does not close",
+        "required_fix": "fix the proof",
+        "patch_locality": "local",
+        "confidence": "high",
+    }
+
+
+def test_proposed_serious_issue_blocks_gate(tmp_path) -> None:
+    from papercheck.mcp_server import handlers
+
+    root = tmp_path / "paper"
+    root.mkdir()
+    (root / "body.tex").write_text(
+        f"\\section{{Intro}}\nIntro line.\n{_SENTENCE}\nAnother line.\n",
+        encoding="utf-8",
+    )
+    handlers.init_audit(root, run_id="run-1")
+    handlers.run_scan(root)
+    handlers.propose_segments(root)
+    handlers.save_inventory_record(root, {"note": "seed"})
+    handlers.advance_stage(root, "AUDITING")
+
+    submitted = handlers.submit_issue(root, _proposed_serious_math_issue())
+    assert submitted["status"] == "PROPOSED"
+
+    result = run_gate(root, mechanical_only=True)
+    assert result["verdict"] == "NOT READY: MATHEMATICAL ISSUE"
+    assert result["warnings"]  # non-empty
+    assert result["signals"]["proposed_blocking_count"] == 1
+    # The blocker line is annotated as awaiting adjudication.
+    assert any("PROPOSED" in b and "awaiting adjudication" in b for b in result["blockers"])
+
+
+def test_no_issues_ready_with_empty_warnings(tmp_path) -> None:
+    root = tmp_path / "paper"
+    root.mkdir()
+    result = run_gate(root, mechanical_only=True)
+    assert result["verdict"] == "READY"
+    assert result["warnings"] == []
+    assert result["signals"]["proposed_blocking_count"] == 0

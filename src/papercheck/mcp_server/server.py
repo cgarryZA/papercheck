@@ -138,10 +138,12 @@ def build_server() -> FastMCP:
 
     @mcp.tool()
     def resolve_manual_check(
-        paper_root: str, check_id: str, resolution: str
+        paper_root: str, check_id: str, resolution: str, resolved_by: str = "human"
     ) -> dict:
         """Resolve a manual check with a resolution."""
-        return handlers.resolve_manual_check(paper_root, check_id, resolution)
+        return handlers.resolve_manual_check(
+            paper_root, check_id, resolution, resolved_by
+        )
 
     @mcp.tool()
     def plan_patch(paper_root: str, patch: dict) -> dict:

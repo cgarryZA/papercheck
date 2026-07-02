@@ -57,6 +57,39 @@ def test_scan_and_gate(tmp_path: Path) -> None:
     assert "READY" in gate.output
 
 
+def test_gate_ready_exits_zero(tmp_path: Path) -> None:
+    paper = _copy_fixture(tmp_path)
+    result = runner.invoke(app, ["gate", str(paper), "--mechanical-only"])
+    assert result.exit_code == 0
+    assert "READY" in result.output
+
+
+def test_gate_draft_marker_exits_two(tmp_path: Path) -> None:
+    paper = tmp_path / "draftpaper"
+    paper.mkdir()
+    (paper / "main.tex").write_text(
+        "\\documentclass{article}\n"
+        "\\begin{document}\n"
+        "% TODO: finish this section\n"
+        "Some content here.\n"
+        "\\end{document}\n",
+        encoding="utf-8",
+    )
+    result = runner.invoke(app, ["gate", str(paper), "--mechanical-only"])
+    assert result.exit_code == 2
+    assert "READY AFTER MECHANICAL FIXES" in result.output
+
+
+def test_segments_shows_ranking(tmp_path: Path) -> None:
+    paper = _copy_fixture(tmp_path)
+    runner.invoke(app, ["scan", str(paper)])
+    result = runner.invoke(app, ["segments", str(paper)])
+    assert result.exit_code == 0
+    assert "S0" in result.output
+    # A numeric risk score appears in the ranked table.
+    assert any(ch.isdigit() for ch in result.output)
+
+
 def test_report_writes_html(tmp_path: Path) -> None:
     paper = _copy_fixture(tmp_path)
     runner.invoke(app, ["gate", str(paper), "--mechanical-only"])

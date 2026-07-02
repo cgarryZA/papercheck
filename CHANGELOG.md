@@ -5,6 +5,33 @@ All notable changes to papercheck are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] — 2026-07-02
+
+### Fixed
+
+- **Gate integrity:** `run_gate` now counts `PROPOSED` FATAL/SERIOUS issues as
+  blockers (routed to their category verdict) instead of returning READY while a
+  credible, quote-verified finding sits un-adjudicated. Adds a `warnings` list
+  and a `proposed_blocking_count` signal to the gate result.
+- **`save_inventory_record`** no longer raises `StateError` when the audit is
+  already at or past `AUDITING`; the internal advance to `INVENTORIED` is now a
+  no-op past that stage.
+- **PyYAML** is now a declared runtime dependency, so `papercheck packs show`
+  works on a clean install (the shipped domain packs are YAML).
+- **`label_exists`** in an issue's verification block is now `null` (not `True`)
+  when no label was supplied — it signals "not checked" rather than "verified".
+
+### Changed
+
+- `papercheck gate` uses tri-state exit codes: 0 (READY), 2 (READY AFTER
+  MECHANICAL FIXES), 1 (any NOT READY), and prints any gate warnings.
+- `papercheck segments` prints a risk-ranked table (segment, budget, risk score,
+  auditors), not just HIGH/MEDIUM/LOW counts.
+- `papercheck packs show/create` report a clean error instead of a traceback.
+- `resolve_manual_check` records a `resolved_by` attribution.
+- Documented the regression-result vocabulary (`FIXED`, `PARTIALLY_FIXED`,
+  `NOT_FIXED`, `NEW_PROBLEM`) in the handler and the regression-auditor prompt.
+
 ## [0.3.1] — 2026-07-02
 
 ### Fixed

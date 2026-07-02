@@ -10,6 +10,8 @@ Return:
 - NOT FIXED
 - NEW PROBLEM INTRODUCED
 
+When recording via the MCP `record_regression_result` tool, the allowed result values are exactly `FIXED`, `PARTIALLY_FIXED`, `NOT_FIXED`, `NEW_PROBLEM` (any other value is rejected).
+
 Check:
 1. Did the patch break notation?
 2. Did it weaken a theorem without updating later claims?

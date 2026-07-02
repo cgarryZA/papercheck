@@ -60,6 +60,14 @@ def test_valid_issue_proposed(tmp_path) -> None:
     assert landed.is_file()
 
 
+def test_no_label_yields_label_exists_none(tmp_path) -> None:
+    root = _make_paper(tmp_path)
+    # A verifiable issue with NO label: nothing was checked -> None, not True.
+    result = submit_issue(root, _issue(location={"file": "body.tex"}))
+    assert result["status"] == "PROPOSED"
+    assert result["verification"]["label_exists"] is None
+
+
 def test_missing_quote_rejected(tmp_path) -> None:
     root = _make_paper(tmp_path)
     result = submit_issue(root, _issue(exact_quote="this text never appears anywhere"))

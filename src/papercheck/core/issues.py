@@ -62,7 +62,8 @@ def submit_issue(paper_root: Path, issue: dict) -> dict:
 
     label = location.get("label")
     if not label:
-        label_exists_result = True
+        # No label supplied -> nothing was checked; report unknown, not True.
+        label_exists_result = None
     elif structure is None:
         # Cannot verify a label without structure — do not fail on it alone.
         label_exists_result = None

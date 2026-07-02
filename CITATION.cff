@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use papercheck, please cite it using these metadata."
 title: papercheck
 type: software
-version: 0.3.1
+version: 0.3.2
 license: MIT
 abstract: >-
   papercheck is a reproducible audit harness for mathematical LaTeX papers. It

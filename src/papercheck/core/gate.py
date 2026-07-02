@@ -96,12 +96,17 @@ def run_gate(paper_root: Path, mechanical_only: bool = False) -> dict:
     draft_markers = list(structure.get("draft_markers", []))
 
     # -- open blocking issues, grouped by (category, severity) ---------------
-    open_issues = [
-        i for i in ledger.list_issues(paper_root) if i.get("status") in _OPEN_STATUSES
+    all_issues = ledger.list_issues(paper_root)
+    open_issues = [i for i in all_issues if i.get("status") in _OPEN_STATUSES]
+    open_blocking = [i for i in open_issues if _severity_of(i) in _BLOCKING_SEVERITIES]
+    # PROPOSED issues of blocking severity are un-adjudicated but must NOT be
+    # blessed: they count as blockers pending adjudication.
+    proposed_blocking = [
+        i
+        for i in all_issues
+        if i.get("status") == "PROPOSED" and _severity_of(i) in _BLOCKING_SEVERITIES
     ]
-    blocking_issues = [
-        i for i in open_issues if _severity_of(i) in _BLOCKING_SEVERITIES
-    ]
+    blocking_issues = open_blocking + proposed_blocking
     categories_blocking = {i.get("category") for i in blocking_issues}
 
     # -- unresolved blocking manual checks -----------------------------------
@@ -113,12 +118,25 @@ def run_gate(paper_root: Path, mechanical_only: bool = False) -> dict:
 
     # -- assemble human-readable blockers ------------------------------------
     blockers: list[str] = []
+    warnings: list[str] = []
     for c in blocking_manual:
         blockers.append(f"Manual check {c.get('check_id')}: {c.get('question')}")
     for i in blocking_issues:
-        blockers.append(
-            f"{i.get('issue_id')} [{i.get('category')}/{_severity_of(i)}]: "
-            f"{i.get('claim', '')}"
+        category = i.get("category")
+        sev = _severity_of(i)
+        if i.get("status") == "PROPOSED":
+            blockers.append(
+                f"{i.get('issue_id')} [{category}/{sev}] "
+                f"(PROPOSED — awaiting adjudication): {i.get('claim', '')}"
+            )
+        else:
+            blockers.append(
+                f"{i.get('issue_id')} [{category}/{sev}]: {i.get('claim', '')}"
+            )
+    if proposed_blocking:
+        warnings.append(
+            f"{len(proposed_blocking)} proposed FATAL/SERIOUS issue(s) "
+            f"await adjudication (counted as blockers)."
         )
     if build_ok is False:
         blockers.append("LaTeX build failed (latexmk returned non-zero).")
@@ -159,6 +177,7 @@ def run_gate(paper_root: Path, mechanical_only: bool = False) -> dict:
     result = {
         "verdict": verdict,
         "blockers": blockers,
+        "warnings": warnings,
         "signals": {
             "build_ok": build_ok,
             "duplicate_labels": duplicate_labels,
@@ -167,6 +186,7 @@ def run_gate(paper_root: Path, mechanical_only: bool = False) -> dict:
             "draft_marker_count": len(draft_markers),
             "blocking_issue_count": len(blocking_issues),
             "blocking_manual_count": len(blocking_manual),
+            "proposed_blocking_count": len(proposed_blocking),
         },
         "mechanical_only": mechanical_only,
     }

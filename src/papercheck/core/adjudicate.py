@@ -149,10 +149,12 @@ def record_patch(paper_root: Path, patch: dict) -> dict:
 def record_regression_result(paper_root: Path, issue_id: str, result: str) -> dict:
     """Append a regression outcome for an issue; promote it if ``FIXED``.
 
+    ``result`` must be one of the allowed regression-vocabulary values:
+    ``FIXED``, ``PARTIALLY_FIXED``, ``NOT_FIXED``, or ``NEW_PROBLEM``. Anything
+    else raises :class:`ValueError`.
+
     Results are appended to ``Paper_Audit/regression.json`` (a JSON list). A
     ``FIXED`` result also moves the issue to ``REGRESSION_PASSED``.
-
-    Raises :class:`ValueError` for an unknown result.
     """
     paper_root = Path(paper_root)
     if result not in _REGRESSION_RESULTS:
@@ -211,8 +213,15 @@ def add_manual_check(
     return check
 
 
-def resolve_manual_check(paper_root: Path, check_id: str, resolution: str) -> dict:
+def resolve_manual_check(
+    paper_root: Path,
+    check_id: str,
+    resolution: str,
+    resolved_by: str = "human",
+) -> dict:
     """Mark a manual check resolved with the given resolution text. Return it.
+
+    ``resolved_by`` records who resolved the check (defaults to ``"human"``).
 
     Raises :class:`KeyError` if the check does not exist.
     """
@@ -223,6 +232,7 @@ def resolve_manual_check(paper_root: Path, check_id: str, resolution: str) -> di
     check = json.loads(path.read_text(encoding="utf-8"))
     check["resolved"] = True
     check["resolution"] = resolution
+    check["resolved_by"] = resolved_by
     schemas.validate(check, "manual_check")
     ledger.save_manual_check(paper_root, check)
     return check

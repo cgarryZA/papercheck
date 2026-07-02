@@ -29,7 +29,7 @@ from papercheck.core import (
 )
 from papercheck.core import verify as _verify
 from papercheck.core._resources import resource_dir
-from papercheck.core.state import AuditState
+from papercheck.core.state import STAGES, AuditState
 
 # Maximum number of source lines a single window read may return.
 _MAX_WINDOW_LINES = 400
@@ -195,7 +195,9 @@ def save_inventory_record(paper_root: str | Path, record: dict) -> dict:
     records.append(record)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(records, indent=2) + "\n", encoding="utf-8")
-    if state.stage != "INVENTORIED":
+    # Only advance forward: re-appending a record once the audit has moved past
+    # INVENTORIED must not attempt an (illegal) backward transition.
+    if STAGES.index(state.stage) < STAGES.index("INVENTORIED"):
         state.advance("INVENTORIED")
     return record
 
@@ -249,9 +251,12 @@ def resolve_manual_check(
     paper_root: str | Path,
     check_id: str,
     resolution: str,
+    resolved_by: str = "human",
 ) -> dict:
     """Resolve a manual check with the given resolution text."""
-    return _adjudicate.resolve_manual_check(_root(paper_root), check_id, resolution)
+    return _adjudicate.resolve_manual_check(
+        _root(paper_root), check_id, resolution, resolved_by
+    )
 
 
 def plan_patch(paper_root: str | Path, patch: dict) -> dict:
