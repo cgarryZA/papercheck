@@ -17,9 +17,20 @@ app = typer.Typer(help="papercheck — audit harness for mathematical LaTeX pape
 
 
 @app.command()
-def init() -> None:
+def init(
+    paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
+) -> None:
     """Initialize a paper's audit workspace."""
-    typer.echo("not implemented")
+    import datetime
+
+    from papercheck.mcp_server import handlers
+
+    run_id = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%SZ")
+    state = handlers.init_audit(paper_root, run_id=run_id)
+    typer.echo(f"Initialized audit at {paths.audit_dir(Path(paper_root))}")
+    typer.echo(f"  run_id: {state['run_id']}")
+    typer.echo(f"  stage:  {state['stage']}")
+    raise typer.Exit(0)
 
 
 @app.command()
@@ -147,15 +158,36 @@ def verify_quote(
 
 
 @app.command()
-def prompts() -> None:
-    """Show the audit prompt pack."""
-    typer.echo("not implemented")
+def prompts(
+    action: str = typer.Argument("list", help="Either 'list' or 'show'."),
+    name: str | None = typer.Argument(None, help="Prompt name (for 'show')."),
+) -> None:
+    """Show the audit prompt pack ('list' names, or 'show <name>')."""
+    from papercheck.mcp_server import handlers
+
+    if action == "list":
+        typer.echo(handlers.list_prompts())
+        raise typer.Exit(0)
+    if action == "show":
+        if not name:
+            typer.echo("prompts show requires a NAME argument")
+            raise typer.Exit(2)
+        try:
+            typer.echo(handlers.get_prompt(name))
+        except KeyError:
+            typer.echo(f"No such prompt: {name}")
+            raise typer.Exit(1) from None
+        raise typer.Exit(0)
+    typer.echo(f"Unknown action {action!r}; expected 'list' or 'show'")
+    raise typer.Exit(2)
 
 
 @app.command()
 def mcp() -> None:
-    """Run the papercheck MCP server."""
-    typer.echo("not implemented")
+    """Run the papercheck MCP server (blocking stdio transport)."""
+    from papercheck.mcp_server.server import main as _server_main
+
+    _server_main()
 
 
 if __name__ == "__main__":
