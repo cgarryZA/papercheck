@@ -95,3 +95,22 @@ Because the agent's reasoning is non-deterministic, treat Tier 2 as a
 qualitative gate over a few runs, not a single pass/fail number. The location
 matching in the helper is a heuristic aid — always read the accepted issues
 yourself against `expected.json` before declaring a pass.
+
+## Free deterministic replay (in CI)
+
+The live Tier 2 run above re-derives findings with a model. Once derived, the
+findings are recorded in `eval/findings.json` and replayed for free — no API
+key, no model — by `eval/run_eval.py` and `tests/test_agent_eval_replay.py`:
+
+```bash
+python eval/run_eval.py            # audits tests/fixtures/* and prints scores
+pytest tests/test_agent_eval_replay.py
+```
+
+This replay drives the SAME harness path (init -> scan -> submit_issue intake
+gate -> adjudicate) and asserts the three real defects are accepted with a
+location match and the trap is rejected. It regression-tests the gate +
+adjudication wiring and catches fixture-source drift (a recorded `exact_quote`
+that no longer matches its source fails `submit_issue` verification). It does
+NOT re-test the prompts — only a fresh live run does that. The latest recorded
+run is in `eval/RESULTS.md`.
