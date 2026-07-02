@@ -9,7 +9,7 @@ A reproducible audit harness for mathematical LaTeX papers.
 <a href="https://github.com/cgarryZA/papercheck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e"></a>
 <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white"></a>
 <img src="https://img.shields.io/badge/tests-140_passing-16a34a">
-<img src="https://img.shields.io/badge/version-0.3.1-8b5cf6">
+<a href="https://pypi.org/project/papercheck/"><img src="https://img.shields.io/pypi/v/papercheck?color=8b5cf6&label=PyPI"></a>
 <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-server-ff6d00"></a>
 
 </div>
