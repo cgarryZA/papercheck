@@ -1,145 +1,225 @@
-# papercheck
+<a name="readme-top"></a>
 
-*A reproducible audit harness for mathematical LaTeX papers.*
+<div align="center">
 
-papercheck turns a mathematical paper into a stage-gated adversarial audit —
-deterministic structure extraction, schema-validated issue ledgers with
-mechanical quote verification, and a final gate that any MCP-capable agent can
-drive but cannot skip.
+<img src="docs/assets/logo.svg" alt="papercheck" width="820"/>
 
-## What it does in 10 seconds
+<br/>
 
-- **Deterministic scanner** — parses your LaTeX sources into a structured
-  `structure.json` (theorems, labels, refs, citations, draft markers) with no
-  guessing and no network calls.
-- **Stage-gated state machine** — the audit advances through fixed stages and
-  refuses out-of-order operations (you cannot plan a patch before an issue is
-  adjudicated).
-- **Verified issues** — every finding must quote the source exactly; quotes,
-  labels, and files are mechanically checked at intake, and unverifiable issues
-  are rejected (`REJECTED_SOURCE_TARGET_INVALID`) before they can enter the
-  ledger.
-- **Mechanical final gate** — a code-enforced gate reports build status and
-  blocking signals and emits a `READY` / `NOT READY` verdict.
-- **MCP + CLI** — drive it from a Typer CLI or from any MCP client (e.g. Claude
-  Code) via a FastMCP server exposing 25 tools plus a vendored prompt pack.
+**Turn a mathematical paper into a stage-gated adversarial audit — deterministic structure extraction, schema-validated issue ledgers with mechanical quote verification, and a final gate that any MCP-capable agent can drive but cannot skip.**
 
-## Quickstart (CLI)
+<br/>
+
+<!-- badges -->
+<a href="https://github.com/cgarryZA/papercheck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-22c55e?style=for-the-badge"></a>
+<a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white"></a>
+<img src="https://img.shields.io/badge/tests-140_passing-16a34a?style=for-the-badge">
+<img src="https://img.shields.io/badge/version-0.3.0-8b5cf6?style=for-the-badge">
+<a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-server-ff6d00?style=for-the-badge"></a>
+
+<br/>
+
+<a href="https://github.com/cgarryZA/papercheck/stargazers"><img src="https://img.shields.io/github/stars/cgarryZA/papercheck?style=social"></a>
+<a href="https://github.com/cgarryZA/papercheck/network/members"><img src="https://img.shields.io/github/forks/cgarryZA/papercheck?style=social"></a>
+<a href="https://github.com/cgarryZA/papercheck/issues"><img src="https://img.shields.io/github/issues/cgarryZA/papercheck?color=facc15"></a>
+
+<br/><br/>
+
+<!-- nav -->
+<a href="#what-it-is"><img src="https://img.shields.io/badge/What_it_is-1f6feb?style=for-the-badge"></a>
+<a href="#why"><img src="https://img.shields.io/badge/Why-1f6feb?style=for-the-badge"></a>
+<a href="#quickstart"><img src="https://img.shields.io/badge/Quickstart-1f6feb?style=for-the-badge"></a>
+<a href="#mcp"><img src="https://img.shields.io/badge/MCP-1f6feb?style=for-the-badge"></a>
+<a href="#how-it-works"><img src="https://img.shields.io/badge/How_it_works-1f6feb?style=for-the-badge"></a>
+<a href="#commands"><img src="https://img.shields.io/badge/Commands-1f6feb?style=for-the-badge"></a>
+<a href="#limitations"><img src="https://img.shields.io/badge/Limitations-1f6feb?style=for-the-badge"></a>
+<a href="#about"><img src="https://img.shields.io/badge/About-1f6feb?style=for-the-badge"></a>
+
+</div>
+
+<br/>
+
+> **papercheck** doesn't ask one model to "review the paper." It builds a review *machine*: segment the manuscript, inventory the claims, run narrow hostile audits, verify every finding against the exact source, adjudicate, patch only what's accepted, then gate. The gates are enforced in **code**, not prose — an agent can drive the whole thing but cannot skip adjudication or slip an unverifiable finding into the ledger.
+
+<br/>
+
+<div align="center">
+<!-- Replace this placeholder with a real demo GIF / screenshot -->
+<img src="docs/assets/demo-placeholder.svg" alt="demo placeholder" width="720"/>
+</div>
+
+<br/>
+
+<a name="what-it-is"></a>
+## 🔎 What it is
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
+
+papercheck is a reproducible audit harness for **LaTeX mathematics papers**. It is a deterministic Python core exposed through a **CLI** and an **MCP server**, so any MCP-capable agent (Claude Code, Codex, Cursor, …) supplies the mathematical judgement while papercheck supplies the mechanism, the memory, and the guardrails.
+
+In 10 seconds, it gives you:
+
+- 🧩 **Deterministic structure extraction** — a LaTeX-AST scanner (theorems, labels, refs, citations, equations, draft markers) → `structure.json`.
+- 🧾 **Schema-validated issue ledgers** — every finding is JSON, validated, and traceable to an exact source location.
+- ✅ **Mechanical quote verification** — a finding whose quote doesn't match the source is **rejected before it enters the ledger**.
+- 🚦 **A stage-gated state machine** — `INIT → SCANNED → … → ADJUDICATED → … → GATED`; patches are refused before adjudication.
+- 🌐 **CLI + MCP + web UI** — script it, drive it from an agent, or browse the audit in your browser.
+
+<br/>
+
+<a name="why"></a>
+## 💡 Why
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
+
+A single "review my paper" prompt fails in three ways. papercheck kills each one **mechanically**:
+
+| Failure mode | What usually happens | papercheck's mechanical fix |
+| --- | --- | --- |
+| **Hallucinated findings** | The model invents a problem that isn't in the text | `submit_issue` matches the exact quote against the source; no match → `REJECTED_SOURCE_TARGET_INVALID`, never reaches the ledger |
+| **Patch-before-proof** | The model starts rewriting before anyone knows what's real | Patches are refused unless the state machine is at `ADJUDICATED` and the issue is `ACCEPTED` |
+| **Skipped gate** | "Looks good to me" with no audit trail | The final gate is computed in code from mechanical signals + accepted blockers, and returns one of a fixed verdict set |
+
+<br/>
+
+<a name="quickstart"></a>
+## 🚀 Quickstart
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
 
 ```bash
 pipx install papercheck        # or: pip install papercheck
-papercheck scan     path/to/paper
-papercheck segments path/to/paper
-papercheck gate     path/to/paper --mechanical-only
+
+papercheck scan     path/to/paper     # extract structure.json
+papercheck segments path/to/paper     # propose audit segments + budgets
+papercheck gate     path/to/paper --mechanical-only   # -> READY / NOT READY ...
+papercheck report   path/to/paper     # self-contained HTML report
+papercheck serve    path/to/paper     # interactive local web UI
 ```
 
-Run it on the bundled example:
+Try it on the bundled example (prints `==== READY ====`):
 
 ```bash
-papercheck gate tests/fixtures/toy_clean_paper --mechanical-only
-# -> prints READY
+papercheck gate examples/toy_clean_paper --mechanical-only
 ```
 
-## CLI commands
+<br/>
 
-- `scan <paper_root>` — deterministic structure extraction to `structure.json`.
-- `segments <paper_root>` — partition the paper into proof segments.
-- `gate <paper_root> [--mechanical-only]` — run the final acceptance gate (mechanical signals only or with LLM audit findings).
-- `render <paper_root>` — render a Markdown report from the ledger.
-- `report <paper_root>` — write a self-contained HTML audit report to `Paper_Audit/report/index.html`.
-- `compare <old_root> <new_root>` — structural diff of two paper versions (theorems, abstract, labels, citations, equations).
-- `profile [list|show <name>]` — list and inspect advisory audit profiles (quick, arxiv, full, journal, no-cloud).
-- `packs [list|show <name>|scaffold --paper-root <root>|create <file.json> --paper-root <root>]` — manage domain packs.
+<a name="mcp"></a>
+## 🤖 Drive it from an agent (MCP)
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
 
-## Domain packs
-
-papercheck ships generic domain packs (`pde`, `optimization`, `machine_learning`, `general`, `stochastic_analysis`, `numerical_analysis`) that define domain-specific fields (e.g. theorem categories, technique keywords). You can scaffold a paper-specific pack deterministically using `papercheck packs scaffold --paper-root <root>`, or fill one in and create it with `papercheck packs create <file.json> --paper-root <root>`. The driving agent (e.g. Claude Code) supplies domain knowledge; papercheck validates and stores the result to `Paper_Audit/domain_pack.json`. Four MCP tools expose domain-pack operations to agents.
-
-A rendered `10_final_acceptance_gate.md` for a clean paper looks like:
-
-```markdown
-Final verdict: READY
-
-| signal                  | value |
-| ----------------------- | ----- |
-| build_ok                | true  |
-| duplicate_labels        | 0     |
-| unresolved_refs         | 0     |
-| unresolved_citations    | 0     |
-| draft_marker_count      | 0     |
-| blocking_issue_count    | 0     |
-| blocking_manual_count   | 0     |
-
-Final rationale: no mechanical blockers; no accepted issues open.
-```
-
-## Quickstart (MCP / Claude Code)
-
-Register the stdio server with Claude Code:
+papercheck ships a **FastMCP** server exposing **29 tools** + the audit prompt pack. Register it once:
 
 ```bash
 claude mcp add papercheck -- papercheck-mcp
 ```
 
-Both `papercheck-mcp` and `papercheck mcp` start the same stdio MCP server.
+Then just ask your agent:
 
-Then just ask the agent to **"audit this paper with papercheck"**. The agent
-walks the workflow — init → scan → segment → audit → adjudicate → gate — by
-calling the MCP tools, while the harness enforces stage order and quote
-verification in code.
+> *"Audit the paper in `./paper` with papercheck."*
 
-> **Note:** papercheck does not call any LLM itself. The reasoning lives in the
-> driving agent (Claude Code or any MCP client), or a human runs the CLI. There
-> are no provider adapters. LLM-produced findings must be independently checked.
+The agent walks the workflow through the MCP tools — `init_audit → run_scan → propose_segments → submit_issue → adjudicate_issue → run_gate` — and **cannot** patch before adjudication or submit a finding whose quote doesn't match the source. The intelligence is the agent's; the discipline is papercheck's.
 
-## How it prevents the failure modes
+<details>
+<summary><b>Generate a paper-specific domain pack (no LLM inside papercheck)</b></summary>
 
-- **Quotes that don't match the source are rejected** before entering the
-  ledger — an issue whose `exact_quote`, label, or file cannot be verified is
-  stored as `REJECTED_SOURCE_TARGET_INVALID`, never as a live finding.
-- **Patches are refused before adjudication** — the state machine will not let
-  you plan or apply a patch for an issue that has not been accepted.
-- **The gate is enforced in code** — the `READY` verdict comes from mechanical
-  signals (build, labels, refs, citations, draft markers, open blockers), not
-  from an agent's say-so.
+<br/>
 
-## Workflow
+papercheck never calls a model itself. To tailor the audit to a paper's field, the agent reads the paper and papercheck validates + persists the result:
 
-The audit advances through these stages, in order:
-
-```
-INIT -> SCANNED -> SEGMENTED -> INVENTORIED -> AUDITING -> SYNTHESIZED
-     -> ADJUDICATED -> PATCH_PLANNED -> PATCHING -> REGRESSED -> GATED
+```bash
+papercheck packs scaffold --paper-root ./paper            # deterministic draft from the scan
+papercheck packs create draft.json --paper-root ./paper   # validated -> Paper_Audit/domain_pack.json
 ```
 
-See [`docs/workflow.md`](docs/workflow.md) for what each stage produces.
+Or via the MCP tools `scaffold_domain_pack` / `create_domain_pack`. Generic packs ship for stochastic analysis, PDE, numerical analysis, optimization, machine-learning theory, and a fully generic `general` pack.
 
-## Limitations
+</details>
 
-See [`docs/limitations.md`](docs/limitations.md) for the full scope. In short:
+<br/>
 
-- **Not a theorem prover** — it does not verify mathematics; it structures and
-  gates an audit.
-- **Not a replacement for peer review.**
-- **May miss semantic errors** — semantic detection depends entirely on the
-  driving LLM (or human); the regex scanner can miss macro-hidden structure.
-- **Findings must be independently checked** — LLM-produced issues are
-  proposals, not proofs.
+<a name="how-it-works"></a>
+## 🧠 How it works
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
 
-## Privacy
+```mermaid
+flowchart LR
+    A[INIT] --> B[SCANNED] --> C[SEGMENTED] --> D[INVENTORIED] --> E[AUDITING]
+    E --> F[SYNTHESIZED] --> G[ADJUDICATED] --> H[PATCH_PLANNED]
+    H --> I[PATCHING] --> J[REGRESSED] --> K[GATED]
 
-**papercheck sends nothing over the network; however, the LLM agent you use to
-drive it may transmit your manuscript to its model provider. Review your
-agent/provider's data terms before auditing unpublished work.**
+    E -. submit_issue .-> V{quote and label verified?}
+    V -- no --> X[REJECTED_SOURCE_TARGET_INVALID]
+    V -- yes --> L[PROPOSED ledger]
+    style X fill:#7f1d1d,stroke:#ef4444,color:#fff
+    style K fill:#14532d,stroke:#22c55e,color:#fff
+```
 
-See [`docs/privacy.md`](docs/privacy.md).
+One deterministic core, two thin frontends, zero LLM calls inside the harness. The model lives in **your** agent (or your hands, via the CLI). papercheck stays strictly an MCP server + CLI — **no provider adapters, no self-orchestration** — so it works with any model and sends nothing over the network itself.
 
-## GitHub Action (mechanical-only checks)
+<br/>
 
-A composite GitHub Action runs the deterministic scanner and gate on every push, producing a `Paper_Audit/` artifact without any LLM calls. See [`docs/ci.md`](docs/ci.md) for setup and configuration.
+<a name="commands"></a>
+## 🛠 Commands
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
 
-## License
+| Command | What it does |
+| --- | --- |
+| `papercheck init` | Create the `Paper_Audit/` workspace + state file |
+| `papercheck scan` | LaTeX-AST structure extraction → `structure.json` |
+| `papercheck segments` | Heuristic segment + budget proposal |
+| `papercheck gate [--mechanical-only]` | Compute the final verdict (exit 0 = READY) |
+| `papercheck verify-quote` | Check a quote against a source file |
+| `papercheck report` | Self-contained HTML audit report |
+| `papercheck serve` | Interactive local web UI (filter issues, click-to-source) |
+| `papercheck compare old/ new/` | Structural diff of two paper versions |
+| `papercheck profile list\|show` | Advisory audit pipelines (`quick`, `arxiv`, `full`, …) |
+| `papercheck packs …` | List / scaffold / create domain packs |
+| `papercheck prompts list\|show` | The vendored audit prompt pack |
+| `papercheck mcp` | Run the MCP server (stdio) |
 
-MIT — see [`LICENSE`](LICENSE).
+<br/>
 
-Prompt pack and domain packs live in `prompts/` and `domain_packs/`.
+### 🔁 CI for your paper repo
+
+A mechanical, **LLM-free** safety net you can drop into any paper repo — see [`docs/ci.md`](docs/ci.md). It runs `scan` + `gate --mechanical-only` on every PR and **never** sends your manuscript anywhere.
+
+<br/>
+
+<a name="limitations"></a>
+## ⚠️ Limitations
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
+
+Read [`docs/limitations.md`](docs/limitations.md) before trusting it. In short:
+
+- ❌ **Not a theorem prover** and **not a replacement for peer review**.
+- 🧠 Semantic error detection depends entirely on the **driving LLM** — papercheck makes it *disciplined and traceable*, not *omniscient*. AI findings must be independently checked.
+- 🔒 **papercheck sends nothing over the network.** However, the **LLM agent you use to drive it may transmit your manuscript to its model provider.** Review your agent/provider's data terms before auditing unpublished work. See [`docs/privacy.md`](docs/privacy.md).
+
+<br/>
+
+<a name="about"></a>
+## 👤 About
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-8b949e"></a>
+
+Built by **Christian Garry** — Graduate Communications Engineer at Siemens and MSc student in Scientific Computing & Data Analysis at Durham University. papercheck reflects a way of working: decompose a hard problem into small, well-defined components with explicit interfaces and hard guarantees, then compose them into a system you can trust.
+
+<div align="center">
+  <a href="https://www.linkedin.com/in/christian-tt-garry/"><img src="https://img.shields.io/badge/LinkedIn-Christian_Garry-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white"></a>
+  <a href="https://christiangarry.com"><img src="https://img.shields.io/badge/Website-christiangarry.com-22c55e?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+</div>
+
+<br/>
+
+## 🤝 Contributing
+
+PRs welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md). Good first issues: renderers, domain packs, new eval fixtures. The architecture is fixed for the 0.x line (strictly MCP + CLI, JSON as source of truth, gates enforced in code); prompt changes are guarded by the eval fixtures in [`docs/agent_eval.md`](docs/agent_eval.md).
+
+## 📜 License & citation
+
+MIT — see [`LICENSE`](LICENSE). If papercheck helps your work, cite it via [`CITATION.cff`](CITATION.cff).
+
+<div align="center">
+<br/>
+<sub>If papercheck is useful to you, a ⭐ helps other people find it.</sub>
+<br/><br/>
+<a href="#readme-top"><img src="https://img.shields.io/badge/⬆-Back_to_top-1f6feb?style=for-the-badge"></a>
+</div>

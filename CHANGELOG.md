@@ -5,6 +5,23 @@ All notable changes to papercheck are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-07-02
+
+### Added
+
+- **LaTeX-AST scanner** — `texscan.scan` now builds a real LaTeX node tree
+  (via `pylatexenc`) instead of regex/line matching, with a graceful regex
+  fallback on malformed input. Output schema is unchanged.
+- **Interactive web UI** — `papercheck serve <paper_root>` starts a local
+  stdlib HTTP server with a filterable issue table (by status/severity/category)
+  and click-to-source; jailed source reader, XSS-safe rendering.
+
+### Fixed
+
+- Single-line `\begin{theorem}\label{...}...\end{theorem}` now attributes the
+  label to the theorem environment; macro-defined (`\newtheorem`) and nested
+  environments are handled.
+
 ## [0.2.0] — 2026-07-02
 
 ### Added
