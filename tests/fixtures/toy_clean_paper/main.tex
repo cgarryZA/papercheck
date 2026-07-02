@@ -1,0 +1,36 @@
+\documentclass{article}
+
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+
+\title{A Small Note on a Nonnegative Sum Bound}
+\author{Test Author}
+\maketitle
+
+\begin{abstract}
+We record a self-contained toy bound on a nonnegative finite sum. The result
+is elementary and serves only as clean test material.
+\end{abstract}
+
+\section{A Bound on a Nonnegative Sum}
+Let $a_1, \dots, a_n$ be real numbers with $a_i \ge 0$ for each $i$. We bound
+their sum by a multiple of the largest term.
+
+\begin{theorem}
+\label{thm:sumbound}
+Let $a_1, \dots, a_n \ge 0$ and let $M = \max_i a_i$. Then
+$\sum_{i=1}^{n} a_i \le n M$.
+\end{theorem}
+
+\begin{proof}
+Each term satisfies $a_i \le M$ by the definition of $M$. Summing these $n$
+inequalities gives $\sum_{i=1}^{n} a_i \le \sum_{i=1}^{n} M = n M$, as wanted.
+\end{proof}
+
+Theorem~\ref{thm:sumbound} is a discrete companion to the bound in
+\cite{knuth1997}.
+
+\end{document}

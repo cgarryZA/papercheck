@@ -49,21 +49,85 @@ def scan(
 
 
 @app.command()
-def segments() -> None:
+def segments(
+    paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
+) -> None:
     """Propose audit segments for a paper."""
-    typer.echo("not implemented")
+    from papercheck.core import segments as segments_mod
+
+    root = Path(paper_root)
+    struct_path = paths.structure_file(root)
+    if struct_path.exists():
+        structure = json.loads(struct_path.read_text(encoding="utf-8"))
+    else:
+        structure = texscan.scan(root)
+
+    records = segments_mod.write_segments(root, structure)
+
+    budget_counts: dict[str, int] = {}
+    for rec in records:
+        budget_counts[rec["budget"]] = budget_counts.get(rec["budget"], 0) + 1
+    summary = ", ".join(
+        f"{level}={budget_counts.get(level, 0)}" for level in ("HIGH", "MEDIUM", "LOW")
+    )
+    typer.echo(f"Proposed {len(records)} segment(s): {summary}")
+    typer.echo(f"segments.json -> {paths.segments_file(root)}")
+    raise typer.Exit(0)
 
 
 @app.command()
-def gate() -> None:
+def gate(
+    paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
+    mechanical_only: bool = typer.Option(
+        False, "--mechanical-only", help="Run only the mechanical gate signals."
+    ),
+) -> None:
     """Run the final gate checks for a paper."""
-    typer.echo("not implemented")
+    from papercheck.core.gate import run_gate
+
+    root = Path(paper_root)
+    result = run_gate(root, mechanical_only=mechanical_only)
+
+    typer.echo("")
+    typer.echo(f"==== {result['verdict']} ====")
+    blockers = result.get("blockers", [])
+    if blockers:
+        typer.echo("Blockers:")
+        for b in blockers:
+            typer.echo(f"  - {b}")
+    else:
+        typer.echo("No blockers.")
+
+    ready = result["verdict"] in {"READY", "READY AFTER MECHANICAL FIXES"}
+    raise typer.Exit(0 if ready else 1)
 
 
 @app.command()
-def render() -> None:
+def render(
+    paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
+) -> None:
     """Render audit reports for a paper."""
-    typer.echo("not implemented")
+    from papercheck.core.render import render_all
+
+    root = Path(paper_root)
+    render_all(root)
+
+    out_dir = paths.audit_dir(root)
+    candidates = [
+        "03_segment_map.md",
+        "07_issue_ledger.proposed.md",
+        "08_issue_ledger.adjudicated.md",
+        "10_final_acceptance_gate.md",
+        "manual_check_queue.md",
+    ]
+    written = [name for name in candidates if (out_dir / name).exists()]
+    if written:
+        typer.echo("Wrote:")
+        for name in written:
+            typer.echo(f"  - {out_dir / name}")
+    else:
+        typer.echo("No reports written (no source artifacts found).")
+    raise typer.Exit(0)
 
 
 @app.command("verify-quote")
