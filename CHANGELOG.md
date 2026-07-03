@@ -5,6 +5,19 @@ All notable changes to papercheck are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] — 2026-07-03
+
+### Changed
+
+- **Unified state machine across CLI and MCP.** `papercheck scan` and
+  `papercheck segments` now advance the shared, persisted audit state
+  (auto-initializing the workspace if needed), so an agent can start at the CLI
+  and switch to the MCP server without hand-advancing stages. Previously the CLI
+  verbs were stateless and left the state at `INIT`.
+- Added `AuditState.ensure_at_least(target)`: an idempotent forward advance used
+  so `scan`/`segments`/inventory can be (re-)run at any later stage without an
+  illegal backward transition.
+
 ## [0.3.2] — 2026-07-02
 
 ### Fixed

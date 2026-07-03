@@ -158,6 +158,21 @@ class AuditState:
         self.stage_history.append({"stage": target, "at": at, "by": by})
         self.save()
 
+    def ensure_at_least(self, target: str, at: str = "", by: str = "cli") -> None:
+        """Advance forward to ``target`` one stage at a time; no-op if already there.
+
+        Unlike :meth:`advance`, this never raises on being already at or past the
+        target — it simply walks forward through any intermediate stages. Moving
+        backward is not attempted. Used so a step can be (re-)run at any later
+        stage without an illegal backward transition.
+        """
+        if target not in STAGES:
+            raise StateError(f"Unknown target stage {target!r}")
+        target_idx = STAGES.index(target)
+        while STAGES.index(self.stage) < target_idx:
+            nxt = STAGES[STAGES.index(self.stage) + 1]
+            self.advance(nxt, at=at, by=by)
+
     def require_at_least(self, stage: str) -> None:
         """Raise if the current stage precedes the given stage."""
         if stage not in STAGES:

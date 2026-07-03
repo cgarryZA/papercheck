@@ -29,7 +29,7 @@ from papercheck.core import (
 )
 from papercheck.core import verify as _verify
 from papercheck.core._resources import resource_dir
-from papercheck.core.state import STAGES, AuditState
+from papercheck.core.state import AuditState
 
 # Maximum number of source lines a single window read may return.
 _MAX_WINDOW_LINES = 400
@@ -170,7 +170,7 @@ def run_scan(paper_root: str | Path) -> dict:
     out_path = paths.structure_file(root)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(structure, indent=2) + "\n", encoding="utf-8")
-    state.advance("SCANNED")
+    state.ensure_at_least("SCANNED")
     return structure
 
 
@@ -181,7 +181,7 @@ def propose_segments(paper_root: str | Path) -> list:
     state.require_at_least("SCANNED")
     structure = get_structure(root)
     records = segments.write_segments(root, structure)
-    state.advance("SEGMENTED")
+    state.ensure_at_least("SEGMENTED")
     return records
 
 
@@ -195,10 +195,9 @@ def save_inventory_record(paper_root: str | Path, record: dict) -> dict:
     records.append(record)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(records, indent=2) + "\n", encoding="utf-8")
-    # Only advance forward: re-appending a record once the audit has moved past
-    # INVENTORIED must not attempt an (illegal) backward transition.
-    if STAGES.index(state.stage) < STAGES.index("INVENTORIED"):
-        state.advance("INVENTORIED")
+    # Idempotent: appending a record once the audit has moved past INVENTORIED
+    # must not attempt an (illegal) backward transition.
+    state.ensure_at_least("INVENTORIED")
     return record
 
 

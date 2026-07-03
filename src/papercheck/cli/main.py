@@ -16,6 +16,23 @@ from papercheck.core import paths, texscan
 app = typer.Typer(help="papercheck — audit harness for mathematical LaTeX papers")
 
 
+def _ensure_audit(root: Path) -> None:
+    """Auto-initialize the audit workspace if it hasn't been created yet.
+
+    Lets the stateful CLI verbs (``scan``, ``segments``) drive the same state
+    machine as the MCP server without forcing the user to run ``init`` first.
+    Existing state is left untouched (never reset).
+    """
+    if paths.state_file(root).exists():
+        return
+    import datetime
+
+    from papercheck.mcp_server import handlers
+
+    run_id = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%SZ")
+    handlers.init_audit(str(root), run_id=run_id)
+
+
 @app.command()
 def init(
     paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
@@ -40,9 +57,16 @@ def scan(
         False, "--json", help="Print the full structure JSON instead of a summary."
     ),
 ) -> None:
-    """Scan a paper's LaTeX sources into a structured representation."""
+    """Scan a paper's LaTeX sources into a structured representation.
+
+    Advances the shared audit state to SCANNED (auto-initializing the workspace
+    if needed), so the CLI and MCP server drive one state machine.
+    """
+    from papercheck.mcp_server import handlers
+
     root = Path(paper_root)
-    result = texscan.scan(root)
+    _ensure_audit(root)
+    result = handlers.run_scan(str(root))
 
     if json_out:
         typer.echo(json.dumps(result, indent=2))
@@ -63,17 +87,23 @@ def scan(
 def segments(
     paper_root: str = typer.Argument(..., help="Path to the paper's source root."),
 ) -> None:
-    """Propose audit segments for a paper."""
-    from papercheck.core import segments as segments_mod
+    """Propose audit segments for a paper.
+
+    Advances the shared audit state to SEGMENTED (scanning first if needed).
+    """
+    from papercheck.core.state import AuditState
+    from papercheck.mcp_server import handlers
 
     root = Path(paper_root)
-    struct_path = paths.structure_file(root)
-    if struct_path.exists():
-        structure = json.loads(struct_path.read_text(encoding="utf-8"))
+    _ensure_audit(root)
+    if not paths.structure_file(root).exists():
+        handlers.run_scan(str(root))
     else:
-        structure = texscan.scan(root)
+        # Structure already present (e.g. from a bare scan); make sure the
+        # shared state has caught up before proposing segments.
+        AuditState.load(root).ensure_at_least("SCANNED")
 
-    records = segments_mod.write_segments(root, structure)
+    records = handlers.propose_segments(str(root))
 
     budget_counts: dict[str, int] = {}
     for rec in records:
