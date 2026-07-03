@@ -79,6 +79,9 @@ def scan(
     typer.echo(f"  unresolved refs:       {len(result['unresolved_refs'])}")
     typer.echo(f"  unresolved citations:  {len(result['unresolved_citations'])}")
     typer.echo(f"  draft markers:         {len(result['draft_markers'])}")
+    suppressed = result.get("suppressed_draft_markers", [])
+    if suppressed:
+        typer.echo(f"  suppressed (pragma):   {len(suppressed)}")
     typer.echo(f"structure.json -> {paths.structure_file(root)}")
     raise typer.Exit(0)
 

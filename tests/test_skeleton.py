@@ -11,7 +11,7 @@ from papercheck.core.paths import audit_dir
 
 
 def test_import_and_version() -> None:
-    assert papercheck.__version__ == "0.3.3"
+    assert papercheck.__version__ == "0.3.4"
 
 
 def test_audit_dir() -> None:

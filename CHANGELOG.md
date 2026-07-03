@@ -5,6 +5,18 @@ All notable changes to papercheck are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] — 2026-07-03
+
+### Added
+
+- **Inline draft-marker suppression.** A line carrying `% papercheck: ignore`
+  (or `% papercheck: ignore draft-marker` / `claim-trigger`) silences findings on
+  that line and the line below — for deliberate `??`/TODO that can't reach the
+  PDF, e.g. an unreachable `\IfFileExists` fallback. Suppressed draft markers are
+  recorded under a new `suppressed_draft_markers` field in `structure.json`
+  (surfaced in the `scan` summary) rather than dropped silently, and no longer
+  count toward the gate verdict.
+
 ## [0.3.3] — 2026-07-03
 
 ### Changed

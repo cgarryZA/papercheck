@@ -22,6 +22,8 @@ Search source files for:
 
 Distinguish blocking issues from harmless build artefacts.
 
+Draft markers a line silences with an inline `% papercheck: ignore` (or `% papercheck: ignore draft-marker`) pragma are deliberate and unreachable (e.g. an `\IfFileExists` fallback that never renders when the file is present). The scanner records these under `suppressed_draft_markers`, not `draft_markers`; do not re-raise them as issues.
+
 For each issue, use the required issue schema.
 
 Write Paper_Audit/reports/source_hygiene_audit.md.

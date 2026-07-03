@@ -100,6 +100,43 @@ _DRAFT_WORD = re.compile(
     r"(?i)\b(TODO|FIXME|TBD|XXX|placeholder|draft)\b|(\?\?)"
 )
 
+# Inline suppression pragma, e.g.  % papercheck: ignore  (all kinds)
+#                                  % papercheck: ignore draft-marker
+#                                  % papercheck: ignore claim-trigger
+# Suppresses findings on the same line and the line immediately below it.
+_IGNORE_PRAGMA = re.compile(
+    r"%\s*papercheck:\s*ignore\b(?:\s+([A-Za-z-]+))?", re.IGNORECASE
+)
+
+
+def _suppression_map(lines: list[str]) -> dict[int, set[str]]:
+    """Map 1-based line numbers to the finding kinds suppressed there.
+
+    A pragma applies to its own line and the line immediately below (so it can
+    trail the marker or sit on its own line just above it). ``"all"`` means a
+    bare ``ignore`` with no kind.
+    """
+    supp: dict[int, set[str]] = {}
+    for idx, raw in enumerate(lines):
+        m = _IGNORE_PRAGMA.search(raw)
+        if not m:
+            continue
+        tok = (m.group(1) or "").lower()
+        if tok in ("draft-marker", "draft-markers", "draft"):
+            kind = "draft-marker"
+        elif tok in ("claim-trigger", "claim-triggers", "claim"):
+            kind = "claim-trigger"
+        else:
+            kind = "all"
+        for ln in (idx + 1, idx + 2):
+            supp.setdefault(ln, set()).add(kind)
+    return supp
+
+
+def _is_suppressed(supp: dict[int, set[str]], lineno: int, kind: str) -> bool:
+    kinds = supp.get(lineno)
+    return bool(kinds) and ("all" in kinds or kind in kinds)
+
 
 def _code_portion(line: str) -> str:
     """Return the portion of a line before an unescaped ``%`` comment."""
@@ -568,23 +605,34 @@ def _scan_non_ast(
     *,
     draft_markers: list[dict],
     claim_triggers: list[dict],
+    suppressed: list[dict],
 ) -> None:
     """Line-based scans the AST does not help with: draft markers + claims.
 
     Draft markers are found on the WHOLE raw line (comments count). Claim
-    triggers are found only in the code portion of non-commented lines.
+    triggers are found only in the code portion of non-commented lines. Findings
+    on a line covered by an inline ``% papercheck: ignore`` pragma are diverted
+    into ``suppressed`` (draft markers) or dropped (claim triggers).
     """
+    supp = _suppression_map(lines)
     for idx, raw in enumerate(lines):
         lineno = idx + 1
-        for m in _DRAFT_WORD.finditer(raw):
+        # Strip any pragma text so the pragma's own words (e.g. "draft" in
+        # "draft-marker") are not themselves detected as markers.
+        scan_line = _IGNORE_PRAGMA.sub("", raw)
+        for m in _DRAFT_WORD.finditer(scan_line):
             marker = m.group(1) or m.group(2)
-            draft_markers.append(
-                {"marker": marker, "file": rel, "line": lineno, "text": raw.strip()}
-            )
+            entry = {"marker": marker, "file": rel, "line": lineno, "text": raw.strip()}
+            if _is_suppressed(supp, lineno, "draft-marker"):
+                suppressed.append(entry)
+            else:
+                draft_markers.append(entry)
         if _is_commented(raw):
             continue
         code = _code_portion(raw)
         for word in _find_claim_triggers(code):
+            if _is_suppressed(supp, lineno, "claim-trigger"):
+                continue
             claim_triggers.append({"word": word, "file": rel, "line": lineno})
 
 
@@ -669,13 +717,17 @@ def scan(paper_root: Path) -> dict:
     equations: list[dict] = []
     draft_markers: list[dict] = []
     claim_triggers: list[dict] = []
+    suppressed_draft_markers: list[dict] = []
 
     for _p, rel, text in tex_sources:
         lines = text.splitlines()
 
         # comment-aware line scans (draft markers, claim triggers)
         _scan_non_ast(
-            lines, rel, draft_markers=draft_markers, claim_triggers=claim_triggers
+            lines, rel,
+            draft_markers=draft_markers,
+            claim_triggers=claim_triggers,
+            suppressed=suppressed_draft_markers,
         )
 
         try:
@@ -752,6 +804,7 @@ def scan(paper_root: Path) -> dict:
         "unused_bib_keys": unused_bib_keys,
         "equations": equations,
         "draft_markers": draft_markers,
+        "suppressed_draft_markers": suppressed_draft_markers,
         "claim_triggers": claim_triggers,
     }
 
